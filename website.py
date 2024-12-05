@@ -34,12 +34,12 @@ with calculator_tab:
         # Investment Amount
         investment_amount = st.number_input('Investment Amount', min_value=0, value=1000, step=100)
         # Interest Rate
-        interest_rate = st.number_input('Interest Rate (%)', min_value=0.0, value=5.0, step=0.1)
+        interest_rate2 = st.number_input('Interest Rate (%)', min_value=0.0, value=5.0, step=0.1)
 
         # Investment Term (Years)
         investment_term_years = st.number_input('Investment Term (Years)', min_value=1, value=1, step=1)
 
         # Calculate Future Value
         if st.button('Calculate Future Value'):
-            future_value = investment_amount * (1 + interest_rate / 100) ** investment_term_years
+            future_value = investment_amount * (1 + interest_rate2 / 100) ** investment_term_years
             st.write(f'Future Value: ${future_value:.2f}')
