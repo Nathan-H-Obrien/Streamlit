@@ -1,6 +1,7 @@
 import streamlit as st
 
 st.title('WealthWise Financials')
+st.tabs(['Home', 'Loan Calculator'])
 st.write('Loan Calculator')
 
 # Loan Amount
