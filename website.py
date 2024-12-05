@@ -20,7 +20,7 @@ with calculator_tab:
         loan_term_months = st.number_input('Loan Term (Months)', min_value=1, value=12, step=1)
 
         # Calculate Monthly Payment
-        if st.button('Calculate'):
+        if st.button('Calculate Loan Payment'):
             monthly_interest_rate = interest_rate / 100 / 12
             if interest_rate == 0:
                 monthly_payment = loan_amount / loan_term_months
@@ -40,6 +40,6 @@ with calculator_tab:
         investment_term_years = st.number_input('Investment Term (Years)', min_value=1, value=1, step=1)
 
         # Calculate Future Value
-        if st.button('Calculate'):
+        if st.button('Calculate Future Value'):
             future_value = investment_amount * (1 + interest_rate / 100) ** investment_term_years
             st.write(f'Future Value: ${future_value:.2f}')
