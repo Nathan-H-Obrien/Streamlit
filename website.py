@@ -10,7 +10,7 @@ with calculator_tab:
     if calculator == 'Loan':
         st.write('Loan Calculator')
         # Loan Amount
-        loan_amount = st.number_input('Loan Amount', min_value=0, value=1000, step=100)
+        loan_amount = st.number_input('Loan Amount', min_value=0.00, value=1000.00, step=100.00)
         # Interest Rate
         interest_rate = st.number_input('Interest Rate (%)', min_value=0.0, value=5.0, step=0.1)
 
