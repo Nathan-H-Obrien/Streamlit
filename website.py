@@ -8,7 +8,7 @@ with calculator_tab:
     st.title('WealthWise Financial Calculators')
     st.write('Use our calculators to make better financial decisions.')
     st.write('Select a calculator from the dropdown menu below.')
-    loan_calculator, investment_calculator = st.tabs('Select a Calculator', ['Loan Calculator', 'Investment Calculator'])
+    loan_calculator, investment_calculator = st.tabs(['Loan Calculator', 'Investment Calculator'])
     with loan_calculator:
         st.write('Loan Calculator')
         # Loan Amount
