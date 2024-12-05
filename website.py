@@ -5,8 +5,7 @@ home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
 with home_tab:
     st.write('Welcome to WealthWise Financials! We help you make better financial decisions.')
 with calculator_tab:
-    st.write('Choose a calculator:')
-    calculator = st.radio(['Investment', 'Loan'])
+    calculator = st.selectbox('Choose a calculator:', ['Investment', 'Loan'])
     
     if calculator == 'Loan':
         st.write('Loan Calculator')
