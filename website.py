@@ -1,10 +1,10 @@
 import streamlit as st
 
 st.title('WealthWise Financials')
-home_tab, loan_calculator_tab = st.tabs(['Home', 'Loan Calculator'])
+home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
 with home_tab:
     st.write('Welcome to WealthWise Financials! We help you make better financial decisions.')
-with loan_calculator_tab:
+with calculator_tab:
     st.write('Loan Calculator')
     # Loan Amount
     loan_amount = st.number_input('Loan Amount', min_value=0, value=1000, step=100)
