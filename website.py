@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.title('Hello World!')
+st.title('WealthWise Financials')
 
 st.write('This is a simple example of a Streamlit web app.')
 
