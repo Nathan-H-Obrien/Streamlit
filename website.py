@@ -49,7 +49,7 @@ with calculator_tab:
         investment_term_years = st.number_input('Investment Term (Years)', min_value=1, value=1, step=1)
 
         # Calculate Future Value
-        if st.button('Calculate'):
+        if st.button('Calculate Future Value'):
             for i in range(1, investment_term_years + 1):
                 current_value = investment_amount * (1 + interest_rate / 100) ** i
                 st.write(f'Year {i}: ${current_value:.2f}')
