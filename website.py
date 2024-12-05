@@ -25,7 +25,19 @@ with calculator_tab:
             else:
                 monthly_payment = loan_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** loan_term_months) / ((1 + monthly_interest_rate) ** loan_term_months - 1)
             
+            total_payment = monthly_payment * loan_term_months
+            total_interest = total_payment - loan_amount
+            
             st.write(f'Monthly Payment: ${monthly_payment:.2f}')
+            st.write(f'Total Interest Paid: ${total_interest:.2f}')
+            
+            for i in range(1, loan_term_months + 1):
+                interest_paid = loan_amount * monthly_interest_rate
+                principal_paid = monthly_payment - interest_paid
+                loan_amount = loan_amount - principal_paid
+                if loan_amount < 0:
+                    loan_amount = 0
+                st.write(f'Month {i}: Interest Paid: {interest_paid:.2f}, Principal Paid: {principal_paid:.2f}, Remaining Loan Amount: {loan_amount:.2f}')
     elif calculator == 'Investment':
         st.write('Investment Calculator')
         # Investment Amount
@@ -38,5 +50,6 @@ with calculator_tab:
 
         # Calculate Future Value
         if st.button('Calculate'):
-            future_value = investment_amount * (1 + interest_rate / 100) ** investment_term_years
-            st.write(f'Future Value: ${future_value:.2f}')
+            for i in range(1, investment_term_years + 1):
+                current_value = investment_amount * (1 + interest_rate / 100) ** i
+                st.write(f'Year {i}: ${current_value:.2f}')
