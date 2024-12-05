@@ -1,31 +1,23 @@
 import streamlit as st
 
 st.title('WealthWise Financials')
+st.write('Loan Calculator')
 
-st.write('This is a simple example of a Streamlit web app.')
+# Loan Amount
+loan_amount = st.number_input('Loan Amount', min_value=0, value=1000, step=100)
+# Interest Rate
+interest_rate = st.number_input('Interest Rate (%)', min_value=0.0, value=5.0, step=0.1)
 
-st.write('You can write text, display data, and even create interactive widgets!')
+# Loan Term (Years)
+loan_term_years = st.number_input('Loan Term (Years)', min_value=1, value=1, step=1)
 
-st.write('You can also add images, videos!')
-
-st.write('You can also add links to your web app!')
-
-st.write('You can also add code snippets!')
-
-st.write('You can also add mathematical equations!')
-
-st.write('You can also add tables!')
-
-st.write('You can also add charts!')
-
-st.write('You can also add maps!')
-
-st.write('You can also add sliders!')
-
-st.write('You can also add buttons!')
-
-st.write('You can also add checkboxes!')
-
-st.write('You can also add radio buttons!')
-
-st.write('You can also add select boxes!')
+# Calculate Monthly Payment
+if st.button('Calculate'):
+    monthly_interest_rate = interest_rate / 100 / 12
+    number_of_payments = loan_term_years * 12
+    if interest_rate == 0:
+        monthly_payment = loan_amount / number_of_payments
+    else:
+        monthly_payment = loan_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** number_of_payments) / ((1 + monthly_interest_rate) ** number_of_payments - 1)
+    
+    st.write(f'Monthly Payment: ${monthly_payment:.2f}')
