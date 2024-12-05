@@ -8,9 +8,8 @@ with calculator_tab:
     st.title('WealthWise Financial Calculators')
     st.write('Use our calculators to make better financial decisions.')
     st.write('Select a calculator from the dropdown menu below.')
-    loan_calculator, investment_calculator = st.radio('Select a Calculator', ['Loan Calculator', 'Investment Calculator'])
-    if loan_calculator == 'Loan Calculator':
-        st.write('You selected the Loan Calculator.')
+    loan_calculator, investment_calculator = st.tabs('Select a Calculator', ['Loan Calculator', 'Investment Calculator'])
+    with loan_calculator:
         st.write('Loan Calculator')
         # Loan Amount
         loan_amount = st.number_input('Loan Amount', min_value=0, value=1000, step=100)
@@ -29,8 +28,8 @@ with calculator_tab:
                 monthly_payment = loan_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** loan_term_months) / ((1 + monthly_interest_rate) ** loan_term_months - 1)
             
             st.write(f'Monthly Payment: ${monthly_payment:.2f}')
-    elif investment_calculator == 'Investment Calculator':
-        st.write('You selected the Investment Calculator.')
+    
+    with investment_calculator:
         st.write('Investment Calculator')
         # Investment Amount
         investment_amount = st.number_input('Investment Amount', min_value=0, value=1000, step=100)
