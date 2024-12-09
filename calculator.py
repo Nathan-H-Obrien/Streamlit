@@ -1,53 +1,10 @@
 import streamlit as st
-import time
 
-# Inject custom CSS
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #0e2537;
-        color: #ceaa61;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .centered-image {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .logo {
-        position: fixed;
-        top: 75px;
-        left: 10px;
-        width: 100px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+def calculator_page():
+    st.title('Calculator')
 
-# Display the mainscreen image for 5 seconds
-mainscreen_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/mainscreen.png'
-mainscreen_placeholder = st.empty()
-with mainscreen_placeholder.container():
-    st.markdown(f'<div class="centered-image"><img src="{mainscreen_url}" style="width: 100%; max-width: 800px;"></div>', unsafe_allow_html=True)
-time.sleep(5)
-
-# Clear the mainscreen image
-mainscreen_placeholder.empty()
-
-# Display the logo image in the top left corner
-logo_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/Logo.jpg'
-st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
-
-st.title('WealthWise Financials')
-home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
-with home_tab:
-    st.write('Welcome to WealthWise Financials! We help you make better financial decisions.')
-with calculator_tab:
     calculator = st.selectbox('Choose a calculator:', ['Investment', 'Loan'])
-    
+
     if calculator == 'Loan':
         st.write('Loan Calculator')
         # Loan Amount
