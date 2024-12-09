@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 # Inject custom CSS
 st.markdown(
@@ -9,10 +10,28 @@ st.markdown(
         color: #ceaa61;
         font-family: 'Times New Roman', Times, serif;
     }
+    .logo {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        width: 100px;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
+
+# Display the mainscreen image for 5 seconds
+mainscreen_url = 'mainscreen.jpg'
+st.image(mainscreen_url, use_column_width=True)
+time.sleep(5)
+
+# Clear the mainscreen image
+st.empty()
+
+# Display the logo image in the top left corner
+logo_url = 'Logo.jpg'
+st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 st.title('WealthWise Financials')
 home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
