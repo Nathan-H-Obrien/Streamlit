@@ -12,7 +12,7 @@ st.markdown(
     }
     .logo {
         position: fixed;
-        top: 20px;
+        top: 50px;
         left: 10px;
         width: 100px;
     }
@@ -23,11 +23,12 @@ st.markdown(
 
 # Display the mainscreen image for 5 seconds
 mainscreen_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/mainscreen.png'
-st.image(mainscreen_url, use_column_width=True)
+mainscreen_placeholder = st.empty()
+mainscreen_placeholder.image(mainscreen_url, use_column_width=True)
 time.sleep(5)
 
 # Clear the mainscreen image
-st.empty()
+mainscreen_placeholder.empty()
 
 # Display the logo image in the top left corner
 logo_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/Logo.jpg'
