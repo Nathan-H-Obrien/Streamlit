@@ -31,7 +31,7 @@ st.empty()
 
 # Display the logo image in the top left corner
 logo_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/logo.jpg'
-st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
+st.logo(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 st.title('WealthWise Financials')
 home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
