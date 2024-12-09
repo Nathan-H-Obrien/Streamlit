@@ -10,6 +10,12 @@ st.markdown(
         color: #ceaa61;
         font-family: 'Times New Roman', Times, serif;
     }
+    .centered-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
     .logo {
         position: fixed;
         top: 75px;
@@ -24,7 +30,8 @@ st.markdown(
 # Display the mainscreen image for 5 seconds
 mainscreen_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/mainscreen.png'
 mainscreen_placeholder = st.empty()
-mainscreen_placeholder.image(mainscreen_url, use_column_width=True)
+with mainscreen_placeholder.container():
+    st.markdown(f'<div class="centered-image"><img src="{mainscreen_url}" style="width: 100%; max-width: 800px;"></div>', unsafe_allow_html=True)
 time.sleep(5)
 
 # Clear the mainscreen image
