@@ -12,7 +12,7 @@ st.markdown(
     }
     .logo {
         position: fixed;
-        top: 10px;
+        top: 20px;
         left: 10px;
         width: 100px;
     }
