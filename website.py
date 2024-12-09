@@ -22,7 +22,7 @@ st.markdown(
 )
 
 # Display the mainscreen image for 5 seconds
-mainscreen_url = 'https://github.com/Nathan-H-Obrien/Streamlit/tree/main/mainscreen.png'
+mainscreen_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/mainscreen.png'
 st.image(mainscreen_url, use_column_width=True)
 time.sleep(5)
 
@@ -30,7 +30,7 @@ time.sleep(5)
 st.empty()
 
 # Display the logo image in the top left corner
-logo_url = 'https://github.com/Nathan-H-Obrien/Streamlit/tree/main/Logo.jpg'
+logo_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/Logo.jpg'
 st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 st.title('WealthWise Financials')
