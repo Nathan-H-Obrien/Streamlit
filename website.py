@@ -1,5 +1,19 @@
 import streamlit as st
 
+# Inject custom CSS
+st.markdown(
+    """
+    <style>
+    body {
+        background-color: #0e2537;
+        color: #ceaa61;
+        font-family: 'Times New Roman', Times, serif;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title('WealthWise Financials')
 home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
 with home_tab:
