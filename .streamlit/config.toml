@@ -1,0 +1,14 @@
+[theme]
+primaryColor = "#FFFFFF"
+backgroundColor = "#0e2537"
+secondaryBackgroundColor = "#000000"
+textColor = "#ceaa61"
+font = "Times New Roman"
+
+[server]
+headless = true
+port = 8501
+enableCORS = false
+
+[logger]
+level = "debug"

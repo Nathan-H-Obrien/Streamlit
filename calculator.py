@@ -1,12 +1,10 @@
 import streamlit as st
 
-st.title('WealthWise Financials')
-home_tab, calculator_tab = st.tabs(['Home', 'Calculator'])
-with home_tab:
-    st.write('Welcome to WealthWise Financials! We help you make better financial decisions.')
-with calculator_tab:
+def calculator_page():
+    st.title('Calculator')
+
     calculator = st.selectbox('Choose a calculator:', ['Investment', 'Loan'])
-    
+
     if calculator == 'Loan':
         st.write('Loan Calculator')
         # Loan Amount
