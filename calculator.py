@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def calculator_page():
     st.title('Calculator')
 
@@ -61,5 +62,6 @@ def calculator_page():
             total_investment = investment_amount
             for i in range(1, investment_term_years + 1):
                 total_investment += additional_contribution
-                current_value = total_investment * (1 + interest_rate / 100) ** i
-                st.write(f'Year {i}: ${current_value:.2f}')
+                interest_earned = total_investment * (interest_rate / 100)
+                total_investment += interest_earned
+                st.write(f'Year {i}: Starting Amount: {total_investment - interest_earned:.2f}, Interest Earned: {interest_earned:.2f}, Total Value: {total_investment:.2f}')
