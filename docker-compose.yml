@@ -1,0 +1,13 @@
+services:
+  app:
+    image: wealthwise
+    build:
+      context: .
+    ports:
+      - "8501:8501"
+    networks:
+      - container_network
+
+networks:
+  container_network:
+    driver: bridge
