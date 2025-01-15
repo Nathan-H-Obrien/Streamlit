@@ -1,4 +1,4 @@
-# WealthWise Finacncials
+# WealthWise Financials
 
 ## Prerequisites
 - Docker Desktop
