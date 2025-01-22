@@ -8,7 +8,7 @@ def login_page():
     password = st.text_input("Password", type="password")
     submit = st.button("Login")
 
-    actual_email = "admin@example.com"
+    actual_email = "admin"
     actual_password = "password"
 
     if submit and email == actual_email and password == actual_password:
