@@ -29,13 +29,9 @@
    Open a web browser and go to: [http://localhost:8501](http://localhost:8501)
 
 ## Making Changes
+  
 
 1. **Make the Appropriate Changes to the Code.**
 
 2. **Rebuild the Docker Image:**
-
-   ```sh
-   docker-compose build
-   docker-compose down
-   docker-compose up -d
-   ```
+   Run the Rebuild.ps1 and test your changes. 

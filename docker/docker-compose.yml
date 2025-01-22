@@ -1,10 +1,17 @@
+version: '3.8'
+
 services:
   app:
     image: wealthwise
     build:
-      context: .
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../python:/app
     ports:
       - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1
     networks:
       - container_network
 
