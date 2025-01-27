@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: wealthwise
@@ -7,7 +5,8 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     volumes:
-      - ../python:/app
+      - ../python:/app/python
+      - ../pictures:/app/pictures
     ports:
       - "8501:8501"
     environment:

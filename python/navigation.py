@@ -1,6 +1,6 @@
 import streamlit as st
-from python.Home import home_page
-from python.calculator import calculator_page
+from Home import home_page
+from calculator import calculator_page
 
 def main_page():
     # Define the pages

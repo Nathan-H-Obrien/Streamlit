@@ -1,5 +1,5 @@
 import streamlit as st
-from python.navigation import main_page  # Import main_page from navigation.py
+from navigation import main_page  # Import main_page from navigation.py
 
 def login_page():
     st.title("Login")
