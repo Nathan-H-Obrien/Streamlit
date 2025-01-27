@@ -26,6 +26,9 @@ def calculator_page():
                 monthly_payment = loan_amount / loan_term_months
             else:
                 monthly_payment = loan_amount * (monthly_interest_rate * (1 + monthly_interest_rate) ** loan_term_months) / ((1 + monthly_interest_rate) ** loan_term_months - 1)
+            total_payment = 0
+            total_interest = 0
+            minimum_payment = monthly_payment
             
             total_payment = 0
             total_interest = 0

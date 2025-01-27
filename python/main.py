@@ -1,4 +1,5 @@
 import streamlit as st
+from login import login_page
 from Home import home_page
 from calculator import calculator_page
 import time
@@ -6,7 +7,7 @@ import time
 # Set page configuration
 st.set_page_config(
     page_title="WealthWise Financials",
-    page_icon="https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/Logo.jpg",
+    page_icon="pictures/Logo.jpg",  # Use the local image
     layout="wide"
 )
 
@@ -38,7 +39,7 @@ st.markdown(
 )
 
 # Display the logo image in the top right corner
-logo_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/Logo.jpg'
+logo_url = 'pictures/Logo.jpg'
 st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 def logo_screen():
@@ -48,7 +49,7 @@ def logo_screen():
 
     # Display the mainscreen image for 5 seconds if not already displayed
     if not st.session_state.startup_displayed:
-        mainscreen_url = 'https://raw.githubusercontent.com/Nathan-H-Obrien/Streamlit/main/mainscreen.png'
+        mainscreen_url = 'pictures/mainscreen.png'  # Use the local image
         mainscreen_placeholder = st.empty()
         with mainscreen_placeholder.container():
             st.markdown(f'<div class="centered-image"><img src="{mainscreen_url}" style="width: 100%; max-width: 800px;"></div>', unsafe_allow_html=True)
@@ -56,25 +57,47 @@ def logo_screen():
         mainscreen_placeholder.empty()
         st.session_state.startup_displayed = True
 
+def main_page():
+    logo_screen()
+
+    # Check if the user is logged in
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+
+    # Display the login page if the user is not logged in
+    if not st.session_state.logged_in:
+        login_page()
+    else:
+        # Define the pages
+        PAGES = {
+            "🏠 Home": home_page,
+            "🧮 Calculator": calculator_page
+        }
+
+        st.sidebar.title('What can we help you with today?')
+
+        # Initialize session state for page selection
+        if 'page_selection' not in st.session_state:
+            st.session_state.page_selection = list(PAGES.keys())[0]
+
+        # Create a button for each page
+        for page_name in PAGES.keys():
+            if st.sidebar.button(page_name):
+                st.session_state.page_selection = page_name
+
+        # Display the selected page
+        page = PAGES[st.session_state.page_selection]
+        page()
+
+# Display the splash screen
 logo_screen()
 
-# Define the pages
-PAGES = {
-    "🏠 Home": home_page,
-    "🧮 Calculator": calculator_page
-}
+# Check if the user is logged in
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
 
-st.sidebar.title('What can we help you with today?')
-
-# Initialize session state for page selection
-if 'page_selection' not in st.session_state:
-    st.session_state.page_selection = list(PAGES.keys())[0]
-
-# Create a button for each page
-for page_name in PAGES.keys():
-    if st.sidebar.button(page_name):
-        st.session_state.page_selection = page_name
-
-# Display the selected page
-page = PAGES[st.session_state.page_selection]
-page()
+# Display the login page if the user is not logged in
+if not st.session_state.logged_in:
+    login_page()
+else:
+    main_page()
