@@ -14,8 +14,12 @@ def login_page():
             cursor = conn.execute("SELECT * FROM admin WHERE email = ? AND password = ?", (email, password))
             cursor2 = conn.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
             if cursor.fetchone():
+                st.success("Login successful")
+                st.session_state.logged_in = True
                 st.rerun()
             elif cursor2.fetchone():
+                st.success("Login successful")
+                st.session_state.logged_in = True
                 st.rerun()
             else:
                 st.write("Invalid username or password")
