@@ -2,11 +2,13 @@ import streamlit as st
 from navigation import main_page  # Import main_page from navigation.py
 
 def login_page():
+    
     st.title("Login")
-
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
-    submit = st.button("Login")
+    with st.form(key="login_form"):
+        email = st.text_input("Email")
+        password = st.text_input("Password", type="password")
+        submit = st.form_submit_button("Login")
+    
 
     actual_email = "admin"
     actual_password = "password"
