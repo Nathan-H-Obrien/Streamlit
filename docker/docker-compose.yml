@@ -1,0 +1,19 @@
+services:
+  app:
+    image: wealthwise
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    volumes:
+      - ../python:/app/python
+      - ../pictures:/app/pictures
+    ports:
+      - "8501:8501"
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - container_network
+
+networks:
+  container_network:
+    driver: bridge
