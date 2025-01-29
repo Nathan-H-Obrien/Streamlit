@@ -43,13 +43,19 @@ def news_section():
             break
         if i < 3:
             with cols[i]:
-                st.header(newsArticles[i]['title'])
+                if i == 0:
+                    st.header(newsArticles[i]['title'])
+                else:
+                    st.subheader(newsArticles[i]['title'])
                 st.image(newsArticles[i]['urlToImage'])
                 st.write(newsArticles[i]['description'])
                 st.write(newsArticles[i]['url'])
         if i >= 3:
             with cols2[i-3]:
-                st.header(newsArticles[i]['title'])
+                if i == 3:
+                    st.header(newsArticles[i]['title'])
+                else:
+                    st.subheader(newsArticles[i]['title'])
                 st.image(newsArticles[i]['urlToImage'])
                 st.write(newsArticles[i]['description'])
                 st.write(newsArticles[i]['url'])
