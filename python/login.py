@@ -1,4 +1,5 @@
 import streamlit as st
+import sqlite3
 from navigation import main_page  # Import main_page from navigation.py
 
 def login_page():
@@ -10,14 +11,21 @@ def login_page():
         submit = st.form_submit_button("Login")
     
 
-    actual_email = "admin"
-    actual_password = "password"
-
-    if submit and email == actual_email and password == actual_password:
-        st.success("Login successful")
-        st.session_state.logged_in = True
-        st.rerun()
-    elif submit and email != actual_email and password != actual_password:
-        st.error("Login failed")
+    if submit:
+        with sqlite3.connect("test.db") as conn:
+            cursor = conn.execute("SELECT * FROM admin WHERE email = ? AND password = ?", (email, password))
+            cursor2 = conn.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+            if cursor.fetchone():
+                st.success("Login successful")
+                st.session_state.logged_in = True
+                st.rerun()
+            elif cursor2.fetchone():
+                st.success("Login successful")
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.write("Invalid username or password")
+                st.error("Invalid username or password")
+                
     else:
         pass

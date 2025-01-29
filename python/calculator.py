@@ -30,7 +30,9 @@ def calculator_page():
             total_interest = 0
             minimum_payment = monthly_payment
             
-            st.write(f'Minimum Monthly Payment: ${minimum_payment:.2f}')
+            total_payment = 0
+            total_interest = 0
+            
             for i in range(1, loan_term_months + 1):
                 interest_paid = loan_amount * monthly_interest_rate
                 principal_paid = monthly_payment - interest_paid + additional_payment
