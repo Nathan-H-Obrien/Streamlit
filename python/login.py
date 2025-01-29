@@ -13,13 +13,10 @@ def login_page():
 
     if submit:
         with sqlite3.connect("test.db") as conn:
-            cursor = conn.execute("SELECT * FROM admin WHERE email = ? AND password = ?", (email, password))
-            cursor2 = conn.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+            cursor = conn.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
             if cursor.fetchone():
-                st.success("Login successful")
-                st.session_state.logged_in = True
-                st.rerun()
-            elif cursor2.fetchone():
+                user_role = cursor.fetchone()[4]  # Assuming the role is the third column in the users table
+                st.session_state.user_role = user_role
                 st.success("Login successful")
                 st.session_state.logged_in = True
                 st.rerun()
