@@ -1,4 +1,3 @@
 streamlit
 streamlit_authenticator
-bcrypt
-sqlite3
+pysqlite3-binary
