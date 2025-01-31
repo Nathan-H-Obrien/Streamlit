@@ -2,6 +2,7 @@ import streamlit as st
 from login import login_page
 from Home import home_page
 from calculator import calculator_page
+from advisorMeeting import meeting_page
 import time
 
 # Set page configuration
@@ -71,7 +72,8 @@ def main_page():
         # Define the pages
         PAGES = {
             "🏠 Home": home_page,
-            "🧮 Calculator": calculator_page
+            "🧮 Calculator": calculator_page,
+            "💻Advisor Info": meeting_page
         }
 
         st.sidebar.title('What can we help you with today?')

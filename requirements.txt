@@ -2,3 +2,4 @@ streamlit
 streamlit_authenticator
 pysqlite3-binary
 newsapi-python
+pandas
