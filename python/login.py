@@ -13,7 +13,7 @@ def login_page():
     
 
     if submit:
-        with sqlite3.connect("test.db") as conn:
+        with sqlite3.connect("../python/test.db") as conn:
             cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, password))
             if cursor.fetchone():
                 st.success("Login successful")
