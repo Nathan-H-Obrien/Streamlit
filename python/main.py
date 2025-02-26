@@ -39,8 +39,8 @@ st.markdown(
 )
 
 # Display the logo image in the top right corner
-logo_url = 'pictures/Logo.jpg'
-st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
+# logo_url = 'pictures/Logo.jpg'
+# st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 def logo_screen():
     # Initialize session state
