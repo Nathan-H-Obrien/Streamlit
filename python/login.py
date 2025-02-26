@@ -2,10 +2,16 @@ import streamlit as st
 import sqlite3
 from navigation import main_page  # Import main_page from navigation.py
 from hashlib import sha256
+from new_user import new_userPage
+import re
 
 def login_page():
     
     st.title("Login")
+    if st.button("New User Registration", key="new_user_registration"):
+        st.empty()
+        new_userPage()
+
     with st.form(key="login_form"):
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
