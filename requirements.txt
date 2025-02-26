@@ -3,3 +3,5 @@ streamlit_authenticator
 pysqlite3-binary
 newsapi-python
 pandas
+sq3lite
+os
