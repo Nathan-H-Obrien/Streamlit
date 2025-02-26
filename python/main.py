@@ -2,6 +2,7 @@ import streamlit as st
 from login import login_page
 from Home import home_page
 from calculator import calculator_page
+from advisorMeeting import meeting_page
 import time
 
 # Set page configuration
@@ -58,36 +59,27 @@ def logo_screen():
         st.session_state.startup_displayed = True
 
 def main_page():
-    logo_screen()
+    # Define the pages
+    PAGES = {
+        "🏠 Home": home_page,
+        "🧮 Calculator": calculator_page,
+        "💻Advisor Info": meeting_page
+    }
 
-    # Check if the user is logged in
-    if 'logged_in' not in st.session_state:
-        st.session_state.logged_in = False
+    st.sidebar.title('What can we help you with today?')
 
-    # Display the login page if the user is not logged in
-    if not st.session_state.logged_in:
-        login_page()
-    else:
-        # Define the pages
-        PAGES = {
-            "🏠 Home": home_page,
-            "🧮 Calculator": calculator_page
-        }
+    # Initialize session state for page selection
+    if 'page_selection' not in st.session_state:
+        st.session_state.page_selection = list(PAGES.keys())[0]
 
-        st.sidebar.title('What can we help you with today?')
+    # Create a button for each page
+    for page_name in PAGES.keys():
+        if st.sidebar.button(page_name):
+            st.session_state.page_selection = page_name
 
-        # Initialize session state for page selection
-        if 'page_selection' not in st.session_state:
-            st.session_state.page_selection = list(PAGES.keys())[0]
-
-        # Create a button for each page
-        for page_name in PAGES.keys():
-            if st.sidebar.button(page_name):
-                st.session_state.page_selection = page_name
-
-        # Display the selected page
-        page = PAGES[st.session_state.page_selection]
-        page()
+    # Display the selected page
+    page = PAGES[st.session_state.page_selection]
+    page()
 
 # Display the splash screen
 logo_screen()

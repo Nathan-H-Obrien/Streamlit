@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3
 from navigation import main_page  # Import main_page from navigation.py
 from hashlib import sha256
 
