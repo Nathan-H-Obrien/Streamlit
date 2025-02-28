@@ -32,24 +32,6 @@ def new_userPage():
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
         password_confirm = st.text_input("Confirm Password", type="password")
-        while not first_name:
-            st.error("First name cannot be blank")
-            st.write("First name cannot be blank")
-        while not last_name:
-            st.error("Last name cannot be blank")
-            st.write("Last name cannot be blank")
-        while check_password(password):
-            st.error("Invalid password")
-            st.write("Invalid password")
-        while password != password_confirm:
-            st.error("Passwords do not match")
-            st.write("Passwords do not match")
-        while not email:
-            st.error("Email cannot be blank")
-            st.write("Email cannot be blank")
-        while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            st.error("Invalid email")
-            st.write("Invalid email")
         
         submit = st.form_submit_button("Register", disabled=not (
             first_name and last_name and email and password and password_confirm and
