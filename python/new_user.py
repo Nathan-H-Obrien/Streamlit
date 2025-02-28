@@ -30,26 +30,15 @@ def new_userPage():
         last_name = st.text_input("Last Name")
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
+        password_confirm = st.text_input("Confirm Password", type="password")
         submit = st.form_submit_button("Register")
         
 
     if submit:
-        while len(first_name) > 20 or len(first_name) < 1:
-            st.error("Invalid first name")
-            st.write("Invalid first name")
-            st.write("Enter a valid first name")
-            st.text_input("First Name")
-        while len(last_name) > 20 or len(last_name) < 1:
-            st.error("Invalid last name")
-            st.write("Invalid last name")
-            st.write("Enter a valid last name")
-            st.text_input("Last Name")
-        while len(email) > 35 or len(email) < 1:
-            st.error("Invalid email")
-            st.write("Invalid email")
-            st.write("Enter a valid email")
-            st.text_input("Email")
         check_password(password)
+        while password != password_confirm:
+            st.error("Passwords do not match")
+            st.write("Passwords do not match")
         with sqlite3.connect("/app/python/test.db") as conn:
             cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
             if cursor.fetchone():
@@ -59,3 +48,7 @@ def new_userPage():
             else:
                 conn.execute("INSERT INTO customers (customer_id, first_name, last_name, email, password, status, subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)", (generate_id(), first_name, last_name, email, sha256(password.encode()).hexdigest(), 'active', 'basic'))
                 st.success("User registered")
+                st.write("User registered")
+                st.session_state.logged_in = True
+                st.rerun()
+                
