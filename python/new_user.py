@@ -34,8 +34,6 @@ def new_userPage():
         password_confirm = st.text_input("Confirm Password", type="password")
         while password != password_confirm:
             st.write("Passwords do not match")
-        while not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            st.write("Invalid email")
         while first_name == "":
             st.write("Invalid first name")
         while last_name == "":
