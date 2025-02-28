@@ -2,10 +2,16 @@ import streamlit as st
 import sqlite3
 from navigation import main_page  # Import main_page from navigation.py
 from hashlib import sha256
+from new_user import new_userPage
+import re
 
 def login_page():
     
     st.title("Login")
+    if st.button("New User Registration", key="new_user_registration"):
+        st.empty()
+        new_userPage()
+
     with st.form(key="login_form"):
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
@@ -13,11 +19,9 @@ def login_page():
     
 
     if submit:
-        with sqlite3.connect("test.db") as conn:
-            cursor = conn.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+        with sqlite3.connect("/app/python/test.db") as conn:
+            cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
             if cursor.fetchone():
-                user_role = cursor.fetchone()[4]  # Assuming the role is the third column in the users table
-                st.session_state.user_role = user_role
                 st.success("Login successful")
                 st.session_state.logged_in = True
                 st.rerun()
@@ -27,3 +31,4 @@ def login_page():
                 
     else:
         pass
+

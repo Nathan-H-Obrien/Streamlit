@@ -50,10 +50,10 @@ def logo_screen():
 
     # Display the mainscreen image for 5 seconds if not already displayed
     if not st.session_state.startup_displayed:
-        mainscreen_url = 'pictures/mainscreen.png'  # Use the local image
+        mainscreen_url = '/app/pictures/mainscreen.png'  # Use the local image
         mainscreen_placeholder = st.empty()
         with mainscreen_placeholder.container():
-            st.markdown(f'<div class="centered-image"><img src="{mainscreen_url}" style="width: 100%; max-width: 800px;"></div>', unsafe_allow_html=True)
+            st.image(mainscreen_url)
         time.sleep(5)
         mainscreen_placeholder.empty()
         st.session_state.startup_displayed = True
