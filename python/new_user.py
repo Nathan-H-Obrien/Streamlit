@@ -12,7 +12,7 @@ def new_userPage():
     def check_password(password):
         if len(password) < 8:
             st.write("invalid password")
-            return
+            return False
 
         has_upper_case = bool(re.search(r'[A-Z]', password))
         has_lower_case = bool(re.search(r'[a-z]', password))
@@ -23,7 +23,9 @@ def new_userPage():
             st.write("invalid password")
             st.write("Password must contain at least 3 of the following:")
             st.write("Uppercase letter, lowercase letter, number, special character")
-            return
+            return False
+
+        return True
 
     st.title("New User Registration")
     with st.form(key="new_user_form"):
@@ -36,7 +38,7 @@ def new_userPage():
         submit = st.form_submit_button("Register", disabled=not (
             first_name and last_name and email and password and password_confirm and
             password == password_confirm and
-            check_password(password) is None
+            check_password(password) is True
         ))
         
 
