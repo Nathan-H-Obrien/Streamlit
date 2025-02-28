@@ -84,7 +84,7 @@ try:
 except sqlite3.Error as e:
     pass
 
-def add_user(first_name, last_name, email, password, status, subscription):
+def add_user(first_name, last_name, email, password):
     with sqlite3.connect('test.db') as conn:
         cursor = conn.execute('''
             SELECT * FROM customers WHERE email = ?
@@ -96,7 +96,7 @@ def add_user(first_name, last_name, email, password, status, subscription):
             conn.execute('''
             INSERT OR IGNORE INTO customers (customer_id, first_name, last_name, email, password, status, subscription, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-        ''', (generate_id(), first_name, last_name, email, sha256(password.encode()).hexdigest(), status, subscription))
+        ''', (generate_id(), first_name, last_name, email, sha256(password.encode()).hexdigest(), 'active', 'basic'))
 
 def add_advisor(first_name, last_name, email, password, status, expertise):
     with sqlite3.connect('test.db') as conn:
@@ -284,8 +284,8 @@ def delete_appointment(appointment_id):
 def generate_id():
     return random.randint(100000, 999999)
 
-add_user('John', 'Doe', 'john.doe@example', 'password1', 'active', 'basic')
-add_user('Jane', 'Doe', 'jane.doe@example', 'password2', 'active', 'premium')
+add_user('John', 'Doe', 'john.doe@example', 'password1')
+add_user('Jane', 'Doe', 'jane.doe@example', 'password2')
 add_advisor('Jake', 'Smith', 'jake.smith@example', 'password3', 'active', 'finance')
 add_advisor('Jill', 'Smith', 'jill.smith@example', 'password4', 'active', 'health')
 add_subscription('basic', 'free', 00.00)

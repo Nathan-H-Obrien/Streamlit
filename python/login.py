@@ -8,9 +8,6 @@ import re
 def login_page():
     
     st.title("Login")
-    if st.button("New User Registration", key="new_user_registration"):
-        st.empty()
-        new_userPage()
 
     with st.form(key="login_form"):
         email = st.text_input("Email")

@@ -4,6 +4,7 @@ from navigation import main_page  # Import main_page from navigation.py
 from hashlib import sha256
 import re
 from create import generate_id
+from create import add_user
 
 
 def new_userPage():
@@ -39,14 +40,14 @@ def new_userPage():
         while password != password_confirm:
             st.error("Passwords do not match")
             st.write("Passwords do not match")
-        with sqlite3.connect("/app/python/test.db") as conn:
+        #with sqlite3.connect("/app/python/test.db") as conn:
+        with sqlite3.connect("test.db") as conn:
             cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
             if cursor.fetchone():
-                st.success("User already exists")
-                st.session_state.logged_in = True
-                st.rerun()
+                st.error("User already exists")
+                st.write("User already exists")
             else:
-                conn.execute("INSERT INTO customers (customer_id, first_name, last_name, email, password, status, subscription, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)", (generate_id(), first_name, last_name, email, sha256(password.encode()).hexdigest(), 'active', 'basic'))
+                add_user(first_name, last_name, email, password)
                 st.success("User registered")
                 st.write("User registered")
                 st.session_state.logged_in = True

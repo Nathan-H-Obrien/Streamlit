@@ -3,6 +3,7 @@ from login import login_page
 from Home import home_page
 from calculator import calculator_page
 from advisorMeeting import meeting_page
+from login_pages import login_screens
 import time
 
 # Set page configuration
@@ -82,7 +83,7 @@ def main_page():
     page()
 
 # Display the splash screen
-logo_screen()
+#logo_screen()
 
 # Check if the user is logged in
 if 'logged_in' not in st.session_state:
@@ -90,6 +91,6 @@ if 'logged_in' not in st.session_state:
 
 # Display the login page if the user is not logged in
 if not st.session_state.logged_in:
-    login_page()
+    login_screens()
 else:
     main_page()
