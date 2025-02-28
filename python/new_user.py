@@ -40,8 +40,8 @@ def new_userPage():
         while password != password_confirm:
             st.error("Passwords do not match")
             st.write("Passwords do not match")
-        #with sqlite3.connect("/app/python/test.db") as conn:
-        with sqlite3.connect("test.db") as conn:
+        with sqlite3.connect("/app/python/test.db") as conn:
+        #with sqlite3.connect("test.db") as conn:
             cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
             if cursor.fetchone():
                 st.error("User already exists")
