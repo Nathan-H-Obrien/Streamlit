@@ -93,4 +93,4 @@ if 'logged_in' not in st.session_state:
 if not st.session_state.logged_in:
     login_screens()
 else:
-    main_page()
+    home_page()
