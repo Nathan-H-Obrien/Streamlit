@@ -3,6 +3,7 @@ from login import login_page
 from Home import home_page
 from calculator import calculator_page
 from advisorMeeting import meeting_page
+from login_pages import login_screens
 import time
 
 # Set page configuration
@@ -39,9 +40,9 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Display the logo image in the top right corner
-logo_url = 'pictures/Logo.jpg'
-st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
+# # Display the logo image in the top right corner
+# logo_url = 'pictures/Logo.jpg'
+# st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
 
 def logo_screen():
     # Initialize session state
@@ -50,10 +51,10 @@ def logo_screen():
 
     # Display the mainscreen image for 5 seconds if not already displayed
     if not st.session_state.startup_displayed:
-        mainscreen_url = 'pictures/mainscreen.png'  # Use the local image
+        mainscreen_url = '/app/pictures/mainscreen.png'  # Use the local image
         mainscreen_placeholder = st.empty()
         with mainscreen_placeholder.container():
-            st.markdown(f'<div class="centered-image"><img src="{mainscreen_url}" style="width: 100%; max-width: 800px;"></div>', unsafe_allow_html=True)
+            st.image(mainscreen_url)
         time.sleep(5)
         mainscreen_placeholder.empty()
         st.session_state.startup_displayed = True
@@ -82,7 +83,7 @@ def main_page():
     page()
 
 # Display the splash screen
-logo_screen()
+#logo_screen()
 
 # Check if the user is logged in
 if 'logged_in' not in st.session_state:
@@ -90,6 +91,6 @@ if 'logged_in' not in st.session_state:
 
 # Display the login page if the user is not logged in
 if not st.session_state.logged_in:
-    login_page()
+    login_screens()
 else:
     main_page()
