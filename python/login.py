@@ -21,9 +21,9 @@ def login_page():
             if cursor.fetchone():
                 st.success("Login successful")
                 st.session_state.logged_in = True
+                st.session_state.page_selection = "🏠 Home"   
                 st.rerun()
             else:
-                st.write("Invalid username or password")
                 st.error("Invalid username or password")
                 
     else:
