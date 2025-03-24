@@ -12,7 +12,7 @@ def new_userPage():
     def check_password(password):
         if len(password) < 8:
             st.write("invalid password")
-            return
+            return False
 
         has_upper_case = bool(re.search(r'[A-Z]', password))
         has_lower_case = bool(re.search(r'[a-z]', password))
@@ -23,7 +23,9 @@ def new_userPage():
             st.write("invalid password")
             st.write("Password must contain at least 3 of the following:")
             st.write("Uppercase letter, lowercase letter, number, special character")
-            return
+            return False
+
+        return True
 
     st.title("New User Registration")
     with st.form(key="new_user_form"):
@@ -32,24 +34,26 @@ def new_userPage():
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
         password_confirm = st.text_input("Confirm Password", type="password")
+        
         submit = st.form_submit_button("Register")
         
-
     if submit:
-        check_password(password)
-        while password != password_confirm:
+        if not (first_name and last_name and email and password and password_confirm):
+            st.error("All fields are required")
+        elif password != password_confirm:
             st.error("Passwords do not match")
-            st.write("Passwords do not match")
-        #with sqlite3.connect("/app/python/test.db") as conn:
-        with sqlite3.connect("test.db") as conn:
-            cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
-            if cursor.fetchone():
-                st.error("User already exists")
-                st.write("User already exists")
-            else:
-                add_user(first_name, last_name, email, password)
-                st.success("User registered")
-                st.write("User registered")
-                st.session_state.logged_in = True
-                st.rerun()
-                
+        elif not check_password(password):
+            st.error("Invalid password")
+        else:
+            with sqlite3.connect("/app/test.db") as conn:
+            #with sqlite3.connect("test.db") as conn:
+                cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
+                if cursor.fetchone():
+                    st.error("User already exists")
+                    st.write("User already exists")
+                else:
+                    add_user(first_name, last_name, email, password)
+                    st.success("User registered")
+                    st.write("User registered")
+                    st.session_state.logged_in = True
+                    st.rerun()
