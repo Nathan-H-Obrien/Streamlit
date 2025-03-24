@@ -56,4 +56,5 @@ def new_userPage():
                     st.success("User registered")
                     st.write("User registered")
                     st.session_state.logged_in = True
+                    st.session_state.page_selection = "🏠 Home"  
                     st.rerun()
