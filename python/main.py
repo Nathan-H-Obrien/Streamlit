@@ -68,6 +68,7 @@ def main_page():
         "💻Advisor Info": meeting_page,
         "🔒 Logout": login_page,
         "Stocks": stock_page,
+
     }
 
     st.sidebar.title('What can we help you with today?')

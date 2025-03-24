@@ -15,6 +15,13 @@ def meeting_page():
         'zoomUrl': 'www.anotherfakeurl.com'
     }]
 
+    @st.dialog("Schedule Meeting")
+    def schedule_meeting():
+        with st.form(key="schedule_meeting_form"):
+            date = st.date_input("Date")
+            time = st.time_input("Time")
+            submit = st.form_submit_button("Schedule Meeting")
+
     st.header('Advisor Page')
     st.write('Welcome to the advisor page where you can manage meetings with your personal advisor!')
     outer_container = st.container(border=True)
@@ -31,4 +38,5 @@ def meeting_page():
             pandaTable = pd.DataFrame(data=tableData, index=[f'Meeting {i+1}'])
             table.add_rows(pandaTable)
             
-    outer_container.button('Schedule meeting')
+    if outer_container.button('Schedule meeting'):
+        schedule_meeting()

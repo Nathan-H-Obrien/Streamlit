@@ -16,14 +16,14 @@ def login_page():
     
 
     if submit:
-        with sqlite3.connect("/app/python/test.db") as conn:
+        with sqlite3.connect("/app/test.db") as conn:
             cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
             if cursor.fetchone():
                 st.success("Login successful")
                 st.session_state.logged_in = True
+                st.session_state.page_selection = "🏠 Home"   
                 st.rerun()
             else:
-                st.write("Invalid username or password")
                 st.error("Invalid username or password")
                 
     else:

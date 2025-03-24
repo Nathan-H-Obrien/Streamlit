@@ -20,7 +20,7 @@ def new_userPage():
         has_non_alphas = bool(re.search(r'\W', password))
 
         if sum([has_upper_case, has_lower_case, has_numbers, has_non_alphas]) < 3:
-            st.write("invalid password")
+            st.write("Invalid password")
             st.write("Password must contain at least 3 of the following:")
             st.write("Uppercase letter, lowercase letter, number, special character")
             return False
