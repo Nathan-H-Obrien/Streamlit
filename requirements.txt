@@ -5,3 +5,4 @@ newsapi-python
 pandas
 sq3lite
 os
+polygon-api-client
