@@ -1,6 +1,7 @@
 import streamlit as st
 from pymongo import MongoClient
 from hashlib import sha256
+from bson.objectid import ObjectId  # Import ObjectId for querying MongoDB
 
 # MongoDB Connection
 MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
@@ -50,7 +51,7 @@ def user_page():
         st.header("Account Info")
         st.write("To view or edit your sensitive information, please re-enter your password.")
         
-        # Ensure the user is logged in and their user_id is available
+        # Ensure the user is logged in and their _id is available
         if "user_id" not in st.session_state:
             st.error("You must be logged in to view this page.")
             return
@@ -65,7 +66,12 @@ def user_page():
             if st.button("Verify Password"):
                 # Verify the entered password
                 hashed_password = sha256(password.encode()).hexdigest()
-                user = users_collection.find_one({"user_id": st.session_state.user_id})
+                try:
+                    user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
+                except Exception as e:
+                    st.error("Invalid user ID format.")
+                    return
+
                 if user and hashed_password == user["password"]:
                     st.success("Password verified!")
                     st.session_state.password_verified = True
@@ -74,7 +80,12 @@ def user_page():
                     st.error("Incorrect password. Please try again.")
         else:
             # Query the database for the user's information
-            user = users_collection.find_one({"user_id": st.session_state.user_id})
+            try:
+                user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
+            except Exception as e:
+                st.error("Invalid user ID format.")
+                return
+
             if not user:
                 st.error("User not found.")
                 return
@@ -104,7 +115,7 @@ def user_page():
                     
                     # Update the user's information in the database
                     users_collection.update_one(
-                        {"user_id": st.session_state.user_id},
+                        {"_id": ObjectId(st.session_state.user_id)},
                         {"$set": {
                             "first_name": first_name,
                             "last_name": last_name,
