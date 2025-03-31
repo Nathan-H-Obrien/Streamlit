@@ -8,5 +8,5 @@ def logout_page():
     if st.button("Back to Login"):
         # Redirect to the login page
         st.session_state.logged_in = False
-        st.session_state.page_selection = "Login"
+        st.session_state.page_selection = "login_screens"
         st.experimental_rerun() 
