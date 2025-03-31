@@ -5,3 +5,8 @@ newsapi-python
 pandas
 polygon-api-client==1.13.4
 pymongo
+setuptools
+yfinance
+plotly
+matplotlib
+numpy
