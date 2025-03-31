@@ -1,7 +1,6 @@
 import streamlit as st
 from pymongo import MongoClient
 from hashlib import sha256
-from navigation import main_page  # Import main_page from navigation.py
 from new_user import new_userPage
 
 # MongoDB Connection
