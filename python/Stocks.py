@@ -6,7 +6,9 @@ from datetime import datetime, timedelta
 def stock_page():
     st.title("Stocks")
 
+
     symbol = st.text_input("Enter a stock symbol (e.g., AAPL)")
+
     if not symbol:
         st.info("Enter a stock symbol to get started")
         return
@@ -75,6 +77,7 @@ def stock_page():
             st.error(f"Error fetching daily open/close data: {e}")
 
     if col3.button("Last Trade"):
+
         try:
             # Get the last trade price (most recent close price)
             last_trade = ticker.history(period="1d")['Close'].iloc[-1]  # The last close price as a proxy for the last trade
@@ -111,3 +114,6 @@ def stock_page():
 
     else:
         st.warning("No historical data available for the selected symbol.")
+
+    
+

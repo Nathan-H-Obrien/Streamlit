@@ -66,28 +66,35 @@ def main_page():
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
         "💻Advisor Info": meeting_page,
-        "🔒 Logout": login_page,
-        "📈 Stocks": stock_page,
+
+        "Stocks": stock_page,
+        "🔒 Logout": logout_page,
+
 
     }
 
     st.sidebar.title('What can we help you with today?')
 
-    # Initialize session state for page selection
-    if 'page_selection' not in st.session_state:
-        st.session_state.page_selection = list(PAGES.keys())[0]
+    if st.session_state.logged_in == True:
+        # Initialize session state for page selection
+        if 'page_selection' not in st.session_state:
+            st.session_state.page_selection = list(PAGES.keys())[0]
 
-    # Create a button for each page
-    for page_name in PAGES.keys():
-        if st.sidebar.button(page_name):
-            st.session_state.page_selection = page_name
+        # Create a button for each page
+        for page_name in PAGES.keys():
+            if st.sidebar.button(page_name):
+                st.session_state.page_selection = page_name
 
     # Display the selected page
-    page = PAGES[st.session_state.page_selection]
-    page()
+        page = PAGES[st.session_state.page_selection]
+        page()
 
 # Display the splash screen
 #logo_screen()
+def logout_page():
+    st.session_state.logged_in = False
+    st.session_state.page_selection = "Login"
+    st.rerun() 
 
 # Check if the user is logged in
 if 'logged_in' not in st.session_state:
