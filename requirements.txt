@@ -3,6 +3,6 @@ streamlit_authenticator
 pysqlite3-binary
 newsapi-python
 pandas
-polygon-api-client==1.13.4
+polygon-api-client
 pymongo
 setuptools
