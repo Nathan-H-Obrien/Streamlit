@@ -5,7 +5,6 @@ from calculator import calculator_page
 from meetings import meeting_page
 from login_pages import login_screens
 from Stocks import stock_page
-from logout import logout_page
 import time
 
 # Set page configuration
@@ -90,6 +89,8 @@ def main_page():
 
 # Display the splash screen
 #logo_screen()
+def logout_page():
+    st.experimental_rerun() 
 
 # Check if the user is logged in
 if 'logged_in' not in st.session_state:
