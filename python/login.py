@@ -27,6 +27,7 @@ def login_page():
         if user:
             st.success("Login successful")
             st.session_state.logged_in = True
+            st.session_state.user_id = str(user["_id"])  # Store _id in session state
             st.session_state.page_selection = "🏠 Home"   
             st.rerun()
         else:

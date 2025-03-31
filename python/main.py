@@ -65,7 +65,7 @@ def main_page():
     PAGES = {
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
-        "💻Advisor Info": meeting_page,
+        "💻 Meetings": meeting_page,
         "🔒 Logout": login_page,
         "Stocks": stock_page,
 
