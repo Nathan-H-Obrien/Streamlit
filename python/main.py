@@ -2,7 +2,7 @@ import streamlit as st
 from login import login_page
 from Home import home_page
 from calculator import calculator_page
-from python.meetings import meeting_page
+from meetings import meeting_page
 from login_pages import login_screens
 from Stocks import stock_page
 import time
