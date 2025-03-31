@@ -35,6 +35,7 @@ def new_userPage():
         first_name = st.text_input("First Name")
         last_name = st.text_input("Last Name")
         email = st.text_input("Email")
+        email = email.lower()  # Normalize email to lowercase
         password = st.text_input("Password", type="password")
         password_confirm = st.text_input("Confirm Password", type="password")
         

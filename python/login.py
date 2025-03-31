@@ -21,6 +21,7 @@ def login_page():
     
     if submit:
         hashed_password = sha256(password.encode()).hexdigest()
+        email = email.lower()  # Normalize email to lowercase
         user = users_collection.find_one({"email": email, "password": hashed_password})
         
         if user:
