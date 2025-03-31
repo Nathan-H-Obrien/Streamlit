@@ -8,7 +8,7 @@ def stock_page():
     st.title("Stocks")
 
     # Set up the API key
-    api_key = os.getenv("POLYGON_API_KEY")
+    api_key = "ZgFptzp39IOpFdfDnnpJUarLO9rN9jQ2"
     if not api_key:
         st.error("API key not found. Please set the POLYGON_API_KEY environment variable.")
         return
