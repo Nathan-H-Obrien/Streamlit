@@ -4,6 +4,7 @@ from Home import home_page
 from calculator import calculator_page
 from meetings import meeting_page
 from login_pages import login_screens
+from user_management import user_page
 from Stocks import stock_page
 import time
 
@@ -65,12 +66,18 @@ def main_page():
     PAGES = {
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
-        "💻Advisor Info": meeting_page,
-
-        "Stocks": stock_page,
+<<<<<<< HEAD
+        "💻 Advisor Info": meeting_page,
+        "📈 Stocks": stock_page,
+        "👤 User Management": user_page,
         "🔒 Logout": logout_page,
 
 
+=======
+        "💻 Meetings": meeting_page,
+        "📈 Stocks": stock_page,
+        "🔒 Logout": login_page,
+>>>>>>> debb7d9c0eb5e571e2aa65f7ebb403279f99b245
     }
 
     st.sidebar.title('What can we help you with today?')
