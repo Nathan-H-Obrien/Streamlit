@@ -2,6 +2,7 @@ import streamlit as st
 from pymongo import MongoClient
 from hashlib import sha256
 from bson.objectid import ObjectId  # Import ObjectId for querying MongoDB
+import re
 
 # MongoDB Connection
 MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
@@ -10,6 +11,23 @@ client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["customers"]  # Collection for storing user credentials
 
+def check_password(password):
+    if len(password) < 8:
+        st.write("Invalid password")
+        return False
+
+    has_upper_case = bool(re.search(r'[A-Z]', password))
+    has_lower_case = bool(re.search(r'[a-z]', password))
+    has_numbers = bool(re.search(r'\d', password))
+    has_non_alphas = bool(re.search(r'\W', password))
+
+    if sum([has_upper_case, has_lower_case, has_numbers, has_non_alphas]) < 3:
+        st.write("Invalid password")
+        st.write("Password must contain at least 3 of the following:")
+        st.write("Uppercase letter, lowercase letter, number, special character")
+        return False
+
+    return True
 def user_page():
     st.title("User Management")
     
@@ -100,6 +118,7 @@ def user_page():
             last_name = st.text_input("Edit Last Name", value=user.get("last_name", ""))
             email = st.text_input("Edit Email", value=user.get("email", ""))
             new_password = st.text_input("Edit Password", type="password")
+            password_confirm = st.text_input("Confirm New Password", type="password")
             
             if st.button("Save Changes"):
                 # Error checking
@@ -107,8 +126,10 @@ def user_page():
                     st.error("All fields are required.")
                 elif "@" not in email:
                     st.error("Invalid email address.")
-                elif len(new_password) < 6:
-                    st.error("Password must be at least 6 characters long.")
+                elif new_password != password_confirm:
+                    st.error("Passwords do not match")
+                elif not check_password(new_password):
+                    st.error("Invalid password")
                 else:
                     # Hash the new password
                     hashed_new_password = sha256(new_password.encode()).hexdigest()
