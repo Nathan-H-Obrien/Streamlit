@@ -74,14 +74,15 @@ def main_page():
 
     st.sidebar.title('What can we help you with today?')
 
-    # Initialize session state for page selection
-    if 'page_selection' not in st.session_state:
-        st.session_state.page_selection = list(PAGES.keys())[0]
+    if st.session_state.logged_in == True:
+        # Initialize session state for page selection
+        if 'page_selection' not in st.session_state:
+            st.session_state.page_selection = list(PAGES.keys())[0]
 
-    # Create a button for each page
-    for page_name in PAGES.keys():
-        if st.sidebar.button(page_name):
-            st.session_state.page_selection = page_name
+        # Create a button for each page
+        for page_name in PAGES.keys():
+            if st.sidebar.button(page_name):
+                st.session_state.page_selection = page_name
 
     # Display the selected page
     page = PAGES[st.session_state.page_selection]
