@@ -90,7 +90,7 @@ def main_page():
 # Display the splash screen
 #logo_screen()
 def logout_page():
-    st.experimental_rerun() 
+    st.rerun() 
 
 # Check if the user is logged in
 if 'logged_in' not in st.session_state:
