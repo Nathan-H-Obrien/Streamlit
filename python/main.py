@@ -66,7 +66,6 @@ def main_page():
     PAGES = {
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
-<<<<<<< HEAD
         "💻 Advisor Info": meeting_page,
         "📈 Stocks": stock_page,
         #"👤 User Management": user_page,
@@ -77,7 +76,6 @@ def main_page():
         "💻 Meetings": meeting_page,
         "📈 Stocks": stock_page,
         "🔒 Logout": login_page,
->>>>>>> debb7d9c0eb5e571e2aa65f7ebb403279f99b245
     }
 
     st.sidebar.title('What can we help you with today?')
