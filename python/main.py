@@ -68,6 +68,7 @@ def main_page():
         "💻 Meetings": meeting_page,
         "📈 Stocks": stock_page,
         "👤 User Management": user_page,
+        
         "🔒 Logout": logout_page,
     }
 
