@@ -1,17 +1,20 @@
 import streamlit as st
-import sqlite3
-from navigation import main_page  # Import main_page from navigation.py
+from pymongo import MongoClient
 from hashlib import sha256
 import re
-from create import generate_id
-from create import add_user
 
+# MongoDB Connection
+MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
+DATABASE_NAME = "WealthWise"  # Change this to your database name
+
+client = MongoClient(MONGO_URI)
+db = client[DATABASE_NAME]
+users_collection = db["customers"]  # Collection for storing user credentials
 
 def new_userPage():
-
     def check_password(password):
         if len(password) < 8:
-            st.write("invalid password")
+            st.write("Invalid password")
             return False
 
         has_upper_case = bool(re.search(r'[A-Z]', password))
@@ -45,16 +48,21 @@ def new_userPage():
         elif not check_password(password):
             st.error("Invalid password")
         else:
-            with sqlite3.connect("/app/test.db") as conn:
-            #with sqlite3.connect("test.db") as conn:
-                cursor = conn.execute("SELECT * FROM customers WHERE email = ? AND password = ?", (email, sha256(password.encode()).hexdigest()))
-                if cursor.fetchone():
-                    st.error("User already exists")
-                    st.write("User already exists")
-                else:
-                    add_user(first_name, last_name, email, password)
-                    st.success("User registered")
-                    st.write("User registered")
-                    st.session_state.logged_in = True
-                    st.session_state.page_selection = "🏠 Home"  
-                    st.rerun()
+            existing_user = users_collection.find_one({"email": email})
+            if existing_user:
+                st.error("User already exists")
+                st.write("User already exists")
+            else:
+                hashed_password = sha256(password.encode()).hexdigest()
+                user_data = {
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "password": hashed_password  # Ensure it's hashed before passing
+                }
+                users_collection.insert_one(user_data)  # Insert into MongoDB
+                st.success("User registered")
+                st.write("User registered")
+                st.session_state.logged_in = True
+                st.session_state.page_selection = "🏠 Home"  
+                st.rerun()
