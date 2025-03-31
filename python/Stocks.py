@@ -31,6 +31,6 @@ def stock_page():
         st.write(open_close)
 
     if col3.button("Last Trade"):
-        last_trade = client.stocks.get_last_trade(symbol)
+        last_trade = client.get_last_trade(symbol)
         st.write(last_trade)
     
