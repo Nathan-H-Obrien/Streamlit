@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 import datetime
-
 # MongoDB Connection
 MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
 DATABASE_NAME = "WealthWise"  # Change this to your database name
@@ -49,6 +48,7 @@ def schedule_meeting(advisor_options, user_id):
             st.rerun()
 
 def meeting_page():
+    st.session_state.password_verified = False
     user_id = st.session_state.get("user_id")
     if not user_id:
         st.error("You must be logged in to view meetings.")

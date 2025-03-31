@@ -2,8 +2,8 @@ import os
 import streamlit as st
 import yfinance as yf
 from datetime import datetime, timedelta
-
 def stock_page():
+    st.session_state.password_verified = False
     st.title("Stocks")
 
 

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 def calculator_page():
+    st.session_state.password_verified = False
     """Displays the calculator page with options for Loan and Investment calculators."""
     st.title('Financial Calculator')
 
