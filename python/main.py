@@ -5,6 +5,7 @@ from calculator import calculator_page
 from meetings import meeting_page
 from login_pages import login_screens
 from Stocks import stock_page
+from logout import logout_page
 import time
 
 # Set page configuration
@@ -66,8 +67,8 @@ def main_page():
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
         "💻Advisor Info": meeting_page,
-        "🔒 Logout": login_page,
         "Stocks": stock_page,
+        "🔒 Logout": logout_page,
 
     }
 
