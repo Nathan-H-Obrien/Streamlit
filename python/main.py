@@ -70,7 +70,6 @@ def main_page():
         "📈 Stocks": stock_page,
         #"👤 User Management": user_page,
         "🔒 Logout": logout_page,
-
     }
 
     st.sidebar.title('What can we help you with today?')
