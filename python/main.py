@@ -3,7 +3,6 @@ from login import login_page
 from Home import home_page
 from calculator import calculator_page
 from meetings import meeting_page
-from login_pages import login_screens
 #from user_management import user_page
 from Stocks import stock_page
 import time
@@ -101,6 +100,6 @@ if 'logged_in' not in st.session_state:
 
 # Display the login page if the user is not logged in
 if not st.session_state.logged_in:
-    login_screens()
+    login_page()
 else:
     main_page()
