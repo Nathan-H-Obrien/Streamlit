@@ -41,6 +41,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+# Display the logo image in the top right corner
 # # Display the logo image in the top right corner
 # logo_url = 'pictures/Logo.jpg'
 # st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
