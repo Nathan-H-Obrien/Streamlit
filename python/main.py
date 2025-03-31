@@ -91,6 +91,7 @@ def main_page():
 #logo_screen()
 def logout_page():
     st.session_state.logged_in = False
+    st.session_state.page_selection = "Login"
     st.rerun() 
 
 # Check if the user is logged in
