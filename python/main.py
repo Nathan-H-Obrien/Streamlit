@@ -66,8 +66,10 @@ def main_page():
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
         "💻Advisor Info": meeting_page,
+
         "Stocks": stock_page,
         "🔒 Logout": logout_page,
+
 
     }
 
