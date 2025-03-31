@@ -85,8 +85,8 @@ def main_page():
                 st.session_state.page_selection = page_name
 
     # Display the selected page
-    page = PAGES[st.session_state.page_selection]
-    page()
+        page = PAGES[st.session_state.page_selection]
+        page()
 
 # Display the splash screen
 #logo_screen()
