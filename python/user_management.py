@@ -1,4 +1,4 @@
 import streamlit as st
 
-def login_page():
+def user_page():
     st.title("user?")
