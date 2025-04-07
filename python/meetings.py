@@ -2,46 +2,70 @@ import streamlit as st
 import pandas as pd
 from pymongo import MongoClient
 import datetime
+
 # MongoDB Connection
-MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
-DATABASE_NAME = "WealthWise"  # Change this to your database name
+MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
+DATABASE_NAME = "WealthWise"
 
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
-meetings_collection = db["appointments"]  # Collection for storing meeting details
-advisors_collection = db["advisors"]  # Collection for storing advisors
+meetings_collection = db["appointments"]
+advisors_collection = db["advisors"]
 
 def round_time_to_nearest_15(dt):
     new_minute = (dt.minute // 15) * 15
     return dt.replace(minute=new_minute, second=0, microsecond=0)
 
 def format_time_12hr(dt):
-    return dt.strftime("%I:%M %p")  # AM/PM format
+    return dt.strftime("%I:%M %p")
 
 def parse_12hr_time(time_str):
-    return datetime.datetime.strptime(time_str, "%Y-%m-%d %I:%M %p")  # Parse the 12-hour format time string
+    return datetime.datetime.strptime(time_str, "%Y-%m-%d %I:%M %p")
 
 @st.dialog("Schedule Meeting")
 def schedule_meeting(advisor_options, user_id):
-    with st.form(key="schedule_meeting_form"):
-        advisor_id = st.selectbox("Select Advisor", options=list(advisor_options.keys()), format_func=lambda x: advisor_options[x])
-        date = st.date_input("Date")
-        current_time = datetime.datetime.now().replace(second=0, microsecond=0)
-        rounded_time = round_time_to_nearest_15(current_time)
-        time = st.time_input("Time", value=rounded_time)
-        
-        # Format the time input to AM/PM format
-        formatted_time = format_time_12hr(datetime.datetime.combine(datetime.date.today(), time))
-        
-        zoom_url = st.text_input("Zoom URL")
+    # Select advisor and date outside the form so they update time slots in real-time
+    advisor_id = st.selectbox("Select Advisor", options=list(advisor_options.keys()), format_func=lambda x: advisor_options[x])
+    date = st.date_input("Select Date")
+
+    time_str = None
+
+    if advisor_id and date:
+        # Fetch existing appointments for this advisor on this date
+        existing_appointments = meetings_collection.find({
+            "advisorId": advisor_id,
+            "date": str(date)
+        })
+        booked_times = {m["time"] for m in existing_appointments}
+
+        # Generate time slots: 10:00 AM – 2:00 PM in 30-minute steps
+        start_hour = 10
+        end_hour = 14
+        interval_minutes = 30
+        time_slots = []
+        for hour in range(start_hour, end_hour + 1):
+            for minute in (0, interval_minutes):
+                if hour == end_hour and minute > 0:
+                    continue
+                time_label = datetime.time(hour, minute).strftime("%I:%M %p")
+                if time_label not in booked_times:
+                    time_slots.append(time_label)
+
+        if time_slots:
+            time_str = st.radio("Select a time", options=time_slots, horizontal=True)
+        else:
+            st.info("No available times for this advisor on the selected date.")
+
+    # Now the form only wraps the submit button
+    with st.form(key="schedule_meeting_form", border=False):
         submit = st.form_submit_button("Schedule Meeting")
-        
-        if submit and advisor_id and zoom_url:
+
+        if submit and advisor_id and time_str:
             meeting_data = {
                 "customerId": user_id,
                 "advisorId": advisor_id,
-                "time": f"{date} {formatted_time}",
-                "zoomUrl": zoom_url
+                "date": str(date),
+                "time": time_str
             }
             meetings_collection.insert_one(meeting_data)
             st.success("Meeting scheduled successfully!")
@@ -53,30 +77,29 @@ def meeting_page():
     if not user_id:
         st.error("You must be logged in to view meetings.")
         return
-    
+
     meetings = list(meetings_collection.find({"customerId": user_id}))
     advisors = list(advisors_collection.find())
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
 
     st.header('Meetings Page')
     st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
-    
+
     outer_container = st.container(border=True)
     meeting_container = outer_container.container(border=False, height=200)
     meeting_container.write('Scheduled meetings')
 
     if meetings:
-        # Extract date and time separately, format the date to Month Day, Year (e.g., April 17, 2025)
         tableData = {
             'Advisor Name': [advisor_options.get(m['advisorId'], m['advisorId']) for m in meetings],
-            'Date': [datetime.datetime.strptime(m['time'], "%Y-%m-%d %I:%M %p").strftime("%B %d, %Y") for m in meetings],  # Extract Date in Month Day, Year format
-            'Time': [format_time_12hr(parse_12hr_time(m['time'])) for m in meetings],  # Convert 12-hour time
-            'Zoom URL': [m['zoomUrl'] for m in meetings]
+            'Date': [datetime.datetime.strptime(m['date'], "%Y-%m-%d").strftime("%B %d, %Y") for m in meetings],
+            'Time': [m['time'] for m in meetings]
         }
+
         pandaTable = pd.DataFrame(data=tableData, index=[f'Meeting {i+1}' for i in range(len(meetings))])
         meeting_container.table(pandaTable)
     else:
         meeting_container.write("No scheduled meetings.")
-        
+
     if outer_container.button('Schedule meeting'):
         schedule_meeting(advisor_options, user_id)
