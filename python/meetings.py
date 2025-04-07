@@ -79,6 +79,13 @@ def meeting_page():
         return
 
     meetings = list(meetings_collection.find({"customerId": user_id}))
+
+    # Sort meetings by soonest
+    def get_meeting_datetime(meeting):
+        return datetime.datetime.strptime(f"{meeting['date']} {meeting['time']}", "%Y-%m-%d %I:%M %p")
+
+    meetings.sort(key=get_meeting_datetime)
+
     advisors = list(advisors_collection.find())
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
 
@@ -86,7 +93,7 @@ def meeting_page():
     st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
 
     outer_container = st.container(border=True)
-    meeting_container = outer_container.container(border=False, height=200)
+    meeting_container = outer_container.container(border=False)
     meeting_container.write('Scheduled meetings')
 
     if meetings:
