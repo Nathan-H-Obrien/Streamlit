@@ -5,7 +5,6 @@ from calculator import calculator_page
 from meetings import meetings_page
 from user_management import user_management_page
 from stocks import stock_page
-import time
 
 # Set page configuration
 st.set_page_config(
