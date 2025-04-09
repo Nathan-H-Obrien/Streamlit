@@ -30,46 +30,51 @@ def new_userPage():
 
         return True
 
-    st.title("New User Registration")
-    with st.form(key="new_user_form"):
-        first_name = st.text_input("First Name")
-        last_name = st.text_input("Last Name")
-        email = st.text_input("Email")
-        email = email.lower()  # Normalize email to lowercase
-        password = st.text_input("Password", type="password")
-        password_confirm = st.text_input("Confirm Password", type="password")
+    col1, col2, col3 = st.columns([1, 3, 1])
+    with col2:
+        st.header("New User Registration", anchor=False)
+        with st.form(key="new_user_form", border=False):
+            first_name = st.text_input("First Name")
+            last_name = st.text_input("Last Name")
+            email = st.text_input("Email")
+            email = email.lower()  # Normalize email to lowercase
+            password = st.text_input("Password", type="password")
+            password_confirm = st.text_input("Confirm Password", type="password")
+            
+            submit = st.form_submit_button("Register", use_container_width=True, type="primary")
         
-        submit = st.form_submit_button("Register")
-        
-    if submit:
-        if not (first_name and last_name and email and password and password_confirm):
-            st.error("All fields are required")
-        elif password != password_confirm:
-            st.error("Passwords do not match")
-        elif not check_password(password):
-            st.error("Invalid password")
-        else:
-            existing_user = users_collection.find_one({"email": email})
-            if existing_user:
-                st.error("User already exists")
-            else:
-
-                
-                hashed_password = sha256(password.encode()).hexdigest()
-                user_data = {
-                    "first_name": first_name,
-                    "last_name": last_name,
-                    "email": email,
-                    "password": hashed_password  # Ensure it's hashed before passing
-                }
-                users_collection.insert_one(user_data)  # Insert into MongoDB
-                st.success("User registered")
-                
-                # Store user info in session state
-                st.session_state.logged_in = True
-                st.session_state.user_id = str(user_data["_id"])
-                
-                # Redirect to home page
-                st.session_state.page_selection = "🏠 Home"
+        if st.button("Already have an account? Login here.", use_container_width=True):
+                st.session_state.page_selection = "Login"
                 st.rerun()
-#
+            
+        if submit:
+            if not (first_name and last_name and email and password and password_confirm):
+                st.error("All fields are required")
+            elif password != password_confirm:
+                st.error("Passwords do not match")
+            elif not check_password(password):
+                st.error("Invalid password")
+            else:
+                existing_user = users_collection.find_one({"email": email})
+                if existing_user:
+                    st.error("User already exists")
+                else:
+
+                    
+                    hashed_password = sha256(password.encode()).hexdigest()
+                    user_data = {
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "email": email,
+                        "password": hashed_password  # Ensure it's hashed before passing
+                    }
+                    users_collection.insert_one(user_data)  # Insert into MongoDB
+                    st.success("User registered")
+                    
+                    # Store user info in session state
+                    st.session_state.logged_in = True
+                    st.session_state.user_id = str(user_data["_id"])
+                    
+                    # Redirect to home page
+                    st.session_state.page_selection = "🏠 Home"
+                    st.rerun()

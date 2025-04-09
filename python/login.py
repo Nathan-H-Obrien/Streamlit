@@ -16,30 +16,31 @@ def login_page():
         st.session_state.page_selection = "Login"
 
     if st.session_state.page_selection == "Login":
-        st.title("Login")
         
-        with st.form(key="login_form"):
-            email = st.text_input("Email")
-            password = st.text_input("Password", type="password")
-            submit = st.form_submit_button("Login")
-        
-        if st.button("New User"):
-            st.session_state.page_selection = "New User"
-            st.rerun()
-
-        if submit:
-            hashed_password = sha256(password.encode()).hexdigest()
-            email = email.lower()  # Normalize email to lowercase
-            user = users_collection.find_one({"email": email, "password": hashed_password})
+        col1, col2, col3 = st.columns([1, 2, 1])  # Adjust width ratio
+        with col2:
+            st.header("Login", anchor=False)
+            with st.form(key="login_form", border=False):
+                email = st.text_input("Email")
+                password = st.text_input("Password", type="password")
+                submit = st.form_submit_button("Login", use_container_width=True, type="primary")
             
-            if user:
-                st.success("Login successful")
-                st.session_state.logged_in = True
-                st.session_state.user_id = str(user["_id"])  # Store user_id in session state
-                st.session_state.page_selection = "🏠 Home"   
+            if st.button("New User? Register here.", use_container_width=True):
+                st.session_state.page_selection = "New User"
                 st.rerun()
-            else:
-                st.error("Invalid username or password")
+
+            if submit:
+                hashed_password = sha256(password.encode()).hexdigest()
+                email = email.lower()  # Normalize email to lowercase
+                user = users_collection.find_one({"email": email, "password": hashed_password})
+                
+                if user:
+                    st.success("Login successful")
+                    st.session_state.logged_in = True
+                    st.session_state.user_id = str(user["_id"])  # Store user_id in session state
+                    st.session_state.page_selection = "🏠 Home"   
+                    st.rerun()
+                else:
+                    st.error("Invalid username or password")
     elif st.session_state.page_selection == "New User":
         new_userPage()
-#
