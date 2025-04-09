@@ -9,7 +9,7 @@ DATABASE_NAME = "WealthWise"  # Change this to your database name
 
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
-users_collection = db["customers"]  # Collection for storing user credentials
+users_collection = db["users"]  # Collection for storing user credentials
 
 def login_page():
     if "page_selection" not in st.session_state:
