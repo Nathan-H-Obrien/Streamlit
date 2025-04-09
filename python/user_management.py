@@ -9,7 +9,7 @@ MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  #
 DATABASE_NAME = "WealthWise"  # Change this to your database name
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
-users_collection = db["customers"]  # Collection for storing user credentials
+users_collection = db["users"]  # Collection for storing user credentials
 
 def check_password(password):
     if len(password) < 8:
