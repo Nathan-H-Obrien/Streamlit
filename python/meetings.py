@@ -85,7 +85,7 @@ def schedule_meeting(advisor_options, user_id):
             st.success("Meeting scheduled successfully!")
             st.rerun()
 
-def meeting_page():
+def meetings_page():
     st.session_state.password_verified = False
     user_id = st.session_state.get("user_id")
     if not user_id:

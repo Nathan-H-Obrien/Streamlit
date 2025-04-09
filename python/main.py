@@ -1,10 +1,10 @@
 import streamlit as st
 from login import login_page
-from Home import home_page
+from home import home_page
 from calculator import calculator_page
-from meetings import meeting_page
-from user_management import user_page
-from Stocks import stock_page
+from meetings import meetings_page
+from user_management import user_management_page
+from stocks import stock_page
 import time
 
 # Set page configuration
@@ -66,9 +66,9 @@ def main_page():
     PAGES = {
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
-        "💻 Meetings": meeting_page,
+        "💻 Meetings": meetings_page,
         "📈 Stocks": stock_page,
-        "👤 User Management": user_page,
+        "👤 User Management": user_management_page,
         
         "🔒 Logout": logout_page,
     }

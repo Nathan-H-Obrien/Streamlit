@@ -1,7 +1,7 @@
 import streamlit as st
 from pymongo import MongoClient
 from hashlib import sha256
-from new_user import new_userPage
+from register import register_page
 
 # MongoDB Connection
 MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
@@ -43,4 +43,4 @@ def login_page():
                 else:
                     st.error("Invalid username or password")
     elif st.session_state.page_selection == "New User":
-        new_userPage()
+        register_page()
