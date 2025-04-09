@@ -9,57 +9,10 @@ import time
 
 # Set page configuration
 st.set_page_config(
-    page_title="WealthWise Financials",
+    page_title="WealthWise Financial",
     page_icon="pictures/Logo.jpg",  # Use the local image
     layout="wide"
 )
-
-# Inject custom CSS for the logo and background
-st.markdown(
-    """
-    <style>
-    body {
-        background-color: #0e2537;
-        color: #ceaa61;
-        font-family: 'Times New Roman', Times, serif;
-    }
-    .centered-image {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .logo {
-        position: fixed;
-        top: 75px;  /* Adjust this value to move the logo down */
-        right: 10px;  /* Position the logo in the top right corner */
-        width: 100px;
-        z-index: 1000;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
-# Display the logo image in the top right corner
-# # Display the logo image in the top right corner
-# logo_url = 'pictures/Logo.jpg'
-# st.markdown(f'<img src="{logo_url}" class="logo">', unsafe_allow_html=True)
-
-def logo_screen():
-    # Initialize session state
-    if 'startup_displayed' not in st.session_state:
-        st.session_state.startup_displayed = False
-
-    # Display the mainscreen image for 5 seconds if not already displayed
-    if not st.session_state.startup_displayed:
-        mainscreen_url = '/app/pictures/mainscreen.png'  # Use the local image
-        mainscreen_placeholder = st.empty()
-        with mainscreen_placeholder.container():
-            st.image(mainscreen_url)
-        time.sleep(5)
-        mainscreen_placeholder.empty()
-        st.session_state.startup_displayed = True
 
 def main_page():
     # Define the pages
@@ -89,8 +42,6 @@ def main_page():
         page = PAGES[st.session_state.page_selection]
         page()
 
-# Display the splash screen
-#logo_screen()
 def logout_page():
     st.session_state.logged_in = False
     st.session_state.page_selection = "Login"
