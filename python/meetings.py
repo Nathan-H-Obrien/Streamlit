@@ -22,11 +22,25 @@ def format_time_12hr(dt):
 def parse_12hr_time(time_str):
     return datetime.datetime.strptime(time_str, "%Y-%m-%d %I:%M %p")
 
+def get_weekday_dates(num_days=30):
+    today = datetime.date.today()
+    weekday_dates = []
+    i = 0
+    while len(weekday_dates) < num_days:
+        day = today + datetime.timedelta(days=i)
+        if day.weekday() < 5:  # 0 = Monday, 6 = Sunday
+            weekday_dates.append(day)
+        i += 1
+    return weekday_dates
+
+
 @st.dialog("Schedule Meeting")
 def schedule_meeting(advisor_options, user_id):
     # Select advisor and date outside the form so they update time slots in real-time
     advisor_id = st.selectbox("Select Advisor", options=list(advisor_options.keys()), format_func=lambda x: advisor_options[x])
-    date = st.date_input("Select Date")
+    weekday_options = get_weekday_dates()
+    date = st.selectbox("Select Date", options=weekday_options, format_func=lambda d: d.strftime("%A, %B %d, %Y"))
+
 
     time_str = None
 
@@ -78,7 +92,28 @@ def meeting_page():
         st.error("You must be logged in to view meetings.")
         return
 
-    meetings = list(meetings_collection.find({"customerId": user_id}))
+    now = datetime.datetime.now()
+
+    # Get all meetings for this user
+    all_meetings = meetings_collection.find({"customerId": user_id})
+
+    # Filter to only future meetings
+    meetings = []
+    for m in all_meetings:
+        meeting_dt = datetime.datetime.strptime(f"{m['date']} {m['time']}", "%Y-%m-%d %I:%M %p")
+        if meeting_dt > now:
+            meetings.append(m)
+
+    # Sort from soonest to farthest
+    meetings.sort(key=lambda m: datetime.datetime.strptime(f"{m['date']} {m['time']}", "%Y-%m-%d %I:%M %p"))
+
+
+    # Sort meetings by soonest
+    def get_meeting_datetime(meeting):
+        return datetime.datetime.strptime(f"{meeting['date']} {meeting['time']}", "%Y-%m-%d %I:%M %p")
+
+    meetings.sort(key=get_meeting_datetime)
+
     advisors = list(advisors_collection.find())
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
 
@@ -86,7 +121,7 @@ def meeting_page():
     st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
 
     outer_container = st.container(border=True)
-    meeting_container = outer_container.container(border=False, height=200)
+    meeting_container = outer_container.container(border=False)
     meeting_container.write('Scheduled meetings')
 
     if meetings:
