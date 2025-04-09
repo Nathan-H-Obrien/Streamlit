@@ -11,7 +11,7 @@ client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["users"]  # Collection for storing user credentials
 
-def new_userPage():
+def register_page():
     def check_password(password):
         if len(password) < 8:
             st.write("Invalid password")

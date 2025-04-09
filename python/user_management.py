@@ -28,7 +28,7 @@ def check_password(password):
         return False
 
     return True
-def user_page():
+def user_management_page():
     st.title("User Management")
     
     # Create tabs

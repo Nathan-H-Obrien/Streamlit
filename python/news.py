@@ -1,6 +1,6 @@
 from newsapi import NewsApiClient
 import streamlit as st
-st.session_state.password_verified = False
+
 NEWS_API_KEY = 'b3ca1de47f7247c2901f0a024292d4f2'
 
 def news_section():
