@@ -39,6 +39,7 @@ def login_page():
                     st.session_state.logged_in = True
                     st.session_state.user_id = str(user["_id"])  # Store user_id in session state
                     st.session_state.page_selection = "🏠 Home"   
+                    st.session_state.subscription_type = user["subscription"]
                     st.rerun()
                 else:
                     st.error("Invalid username or password")

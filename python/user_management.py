@@ -4,7 +4,7 @@ from hashlib import sha256
 from bson.objectid import ObjectId  # Import ObjectId for querying MongoDB
 import re
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # MongoDB Connection
 MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
@@ -44,12 +44,65 @@ def user_management_page():
         "View Events/Meetings",
         "View Info & Delete Account"
     ])
-    
+
     # Tab 1: Payment & Subscription
     with tabs[0]:
         st.header("Payment & Subscription", anchor=False)
         st.write("Update your payment method and manage your subscription.")
-        # Add logic for payment and subscription management here
+
+        if "user_id" not in st.session_state:
+            st.error("You must be logged in to manage your subscription.")
+            st.stop()
+
+        user_id = ObjectId(st.session_state.user_id)
+        user = users_collection.find_one({"_id": user_id})
+
+        # Handle expired Elite subscriptions
+        if user.get("subscription") == "Elite" and user.get("subscription_end"):
+            try:
+                subscription_end = datetime.strptime(user["subscription_end"], "%Y-%m-%d")
+                if subscription_end < datetime.now():
+                    users_collection.update_one(
+                        {"_id": user_id},
+                        {"$set": {"subscription": "Basic"},
+                        "$unset": {"subscription_start": "", "subscription_end": ""}}
+                    )
+                    st.warning("Your Elite subscription has expired and you have been downgraded to the Basic plan.")
+                    st.rerun()
+            except ValueError:
+                st.error("Error parsing subscription end date.")
+
+        current_plan = user.get("subscription", "Basic")
+        subscription_end = user.get("subscription_end")
+
+        st.subheader("Current Plan", anchor=False)
+        st.write(f"You are currently subscribed to the **{current_plan}** plan.")
+
+        # Show subscription expiration date for Elite users
+        if current_plan == "Elite":
+            if subscription_end:
+                end_date = datetime.strptime(subscription_end, "%Y-%m-%d")
+                st.success(f"Elite subscription valid until **{end_date.strftime('%B %d, %Y')}**.")
+            else:
+                st.warning("Elite subscription is active, but no expiration date is set.")
+        else:
+            st.info("Upgrade to Elite for $100/year to unlock all features.")
+
+            st.subheader("Upgrade to Elite")
+            if st.button("Upgrade Now for $100/year"):
+                today = datetime.now()
+                end_date = today + timedelta(days=365)
+
+                users_collection.update_one(
+                    {"_id": user_id},
+                    {"$set": {
+                        "subscription": "Elite",
+                        "subscription_start": today.strftime("%Y-%m-%d"),
+                        "subscription_end": end_date.strftime("%Y-%m-%d")
+                    }}
+                )
+                st.success(f"Subscription upgraded to Elite! Valid until {end_date.strftime('%B %d, %Y')}.")
+                st.rerun()
 
     # Tab 2: Chat with Advisor
     with tabs[1]:

@@ -88,9 +88,22 @@ def schedule_meeting(advisor_options, user_id):
 def meetings_page():
     st.session_state.password_verified = False
     user_id = st.session_state.get("user_id")
+    subscription_type = st.session_state.get("subscription_type", "Basic")
+
     if not user_id:
         st.error("You must be logged in to view meetings.")
         return
+
+    st.header('Meetings Page')
+    st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
+
+    if subscription_type != "Elite":
+        st.warning("Only Elite users have access to meetings with personal advisors.")
+        if st.button("Upgrade to Elite Subscription here!", use_container_width=True):
+            st.session_state.page_selection = "👤 User Management"
+            st.rerun()
+        return
+
 
     now = datetime.datetime.now()
 
@@ -107,7 +120,6 @@ def meetings_page():
     # Sort from soonest to farthest
     meetings.sort(key=lambda m: datetime.datetime.strptime(f"{m['date']} {m['time']}", "%Y-%m-%d %I:%M %p"))
 
-
     # Sort meetings by soonest
     def get_meeting_datetime(meeting):
         return datetime.datetime.strptime(f"{meeting['date']} {meeting['time']}", "%Y-%m-%d %I:%M %p")
@@ -116,9 +128,6 @@ def meetings_page():
 
     advisors = list(advisors_collection.find())
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
-
-    st.header('Meetings Page')
-    st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
 
     outer_container = st.container(border=True)
     meeting_container = outer_container.container(border=False)

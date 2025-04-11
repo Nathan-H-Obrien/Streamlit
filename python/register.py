@@ -59,21 +59,22 @@ def register_page():
                 if existing_user:
                     st.error("User already exists")
                 else:
-
-                    
                     hashed_password = sha256(password.encode()).hexdigest()
                     user_data = {
-                        "first_name": first_name,
-                        "last_name": last_name,
-                        "email": email,
-                        "password": hashed_password  # Ensure it's hashed before passing
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "email": email,
+                    "password": hashed_password,
+                    "subscription": "Basic"
                     }
+
                     users_collection.insert_one(user_data)  # Insert into MongoDB
                     st.success("User registered")
                     
                     # Store user info in session state
                     st.session_state.logged_in = True
                     st.session_state.user_id = str(user_data["_id"])
+                    st.session_state.subscription_type = "Basic"
                     
                     # Redirect to home page
                     st.session_state.page_selection = "🏠 Home"
