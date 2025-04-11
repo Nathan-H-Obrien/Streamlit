@@ -3,13 +3,18 @@ from pymongo import MongoClient
 from hashlib import sha256
 from bson.objectid import ObjectId  # Import ObjectId for querying MongoDB
 import re
+import yfinance as yf
+from datetime import datetime
 
 # MongoDB Connection
-MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"  # Change if using MongoDB Atlas
-DATABASE_NAME = "WealthWise"  # Change this to your database name
+MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
+DATABASE_NAME = "WealthWise"
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["users"]  # Collection for storing user credentials
+portfolios_collection = db["portfolios"]
+meetings_collection = db["appointments"]
+advisors_collection = db["advisors"]
 
 def check_password(password):
     if len(password) < 8:
@@ -29,7 +34,7 @@ def check_password(password):
 
     return True
 def user_management_page():
-    st.title("User Management")
+    st.title("User Management", anchor=False)
     
     # Create tabs
     tabs = st.tabs([
@@ -42,31 +47,152 @@ def user_management_page():
     
     # Tab 1: Payment & Subscription
     with tabs[0]:
-        st.header("Payment & Subscription")
+        st.header("Payment & Subscription", anchor=False)
         st.write("Update your payment method and manage your subscription.")
         # Add logic for payment and subscription management here
 
     # Tab 2: Chat with Advisor
     with tabs[1]:
-        st.header("Chat with Advisor")
+        st.header("Chat with Advisor", anchor=False)
         st.write("Start a conversation with your advisor.")
         # Add chat functionality here
 
-    # Tab 3: Manage Portfolio
+        # Tab 3: Manage Portfolio
     with tabs[2]:
-        st.header("Manage Portfolio")
-        st.write("Add, manage, and view your stocks and portfolio.")
-        # Add portfolio management functionality here
+        st.header("Manage Portfolio", anchor=False)
+        
+        if "user_id" not in st.session_state:
+            st.error("You must be logged in to manage your portfolio.")
+            st.stop()
+
+        user_id = ObjectId(st.session_state.user_id)
+
+        # Fetch or initialize portfolio
+        portfolio = portfolios_collection.find_one({"user_id": user_id})
+        if not portfolio:
+            portfolios_collection.insert_one({"user_id": user_id, "holdings": {}})
+            portfolio = {"holdings": {}}
+
+        holdings = portfolio.get("holdings", {})
+
+        # Helper function to get live price
+        def get_live_price(ticker):
+            try:
+                stock = yf.Ticker(ticker)
+                live_price = stock.history(period='1d')['Close'].iloc[-1]
+                return live_price
+            except:
+                return None
+
+        # Display current holdings with live prices
+        st.subheader("Current Holdings", anchor=False)
+        if holdings:
+            for stock, qty in holdings.items():
+                live_price = get_live_price(stock)
+                if live_price:
+                    total_value = qty * live_price
+                    st.write(f"**{stock}**: {qty} shares @ \${live_price:.2f} (Total: \${total_value:.2f})")
+                else:
+                    st.write(f"**{stock}**: {qty} shares (Live price unavailable)")
+        else:
+            st.write("You don't have any holdings yet.")
+
+        # Form to add/remove stocks
+        st.subheader("Update Holdings", anchor=False)
+        with st.form("update_portfolio"):
+            stock_symbol = st.text_input("Stock Symbol (e.g., AAPL)").upper().strip()
+            quantity = st.number_input("Quantity", min_value=0.0, step=0.01, format="%.2f", placeholder=0.0)
+            action = st.radio("Action", ["Add", "Remove"])
+            submit = st.form_submit_button("Update Portfolio")
+
+            if submit:
+                if not stock_symbol:
+                    st.error("Stock symbol cannot be empty.")
+                else:
+                    updated_qty = holdings.get(stock_symbol, 0)
+                    if action == "Add":
+                        updated_qty += quantity
+                    elif action == "Remove":
+                        if quantity > updated_qty:
+                            st.error(f"You only own {updated_qty} shares of {stock_symbol}. Cannot remove more.")
+                            st.stop()
+                        updated_qty -= quantity
+
+                    if updated_qty > 0:
+                        holdings[stock_symbol] = updated_qty
+                    elif stock_symbol in holdings:
+                        del holdings[stock_symbol]
+
+                    portfolios_collection.update_one(
+                        {"user_id": user_id},
+                        {"$set": {"holdings": holdings}}
+                    )
+                    st.success(f"Portfolio updated! {stock_symbol}: {updated_qty} shares")
+                    st.rerun()
+
 
     # Tab 4: View Events/Meetings
     with tabs[3]:
-        st.header("View Events/Meetings")
+        st.header("View Events/Meetings", anchor=False)
         st.write("View your registered events or scheduled meetings.")
-        # Add event/meeting management functionality here
+
+        if "user_id" not in st.session_state:
+            st.error("You must be logged in to view your meetings.")
+            st.stop()
+
+        user_id = st.session_state.user_id
+
+        # Fetch all meetings for the user
+        meetings = list(meetings_collection.find({"customerId": user_id}))
+
+        if not meetings:
+            st.write("You have no scheduled meetings.")
+            return
+
+        # Get current date to compare with meeting dates
+        current_date = datetime.now()
+
+        # Separate meetings into past and future
+        past_meetings = []
+        future_meetings = []
+        
+        for meeting in meetings:
+            # Convert stored date string to a datetime object
+            meeting_date = datetime.strptime(meeting["date"], "%Y-%m-%d")
+            
+            # Check if the meeting is in the past or future
+            if meeting_date < current_date:
+                past_meetings.append(meeting)
+            else:
+                future_meetings.append(meeting)
+
+        # Display Future Meetings
+        if future_meetings:
+            st.subheader("Future Meetings", anchor=False)
+            for meeting in future_meetings:
+                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                meeting_time = f"{meeting['time']} on {meeting['date']}"
+                st.write(f"**{advisor_name}**: {meeting_time}")
+
+        else:
+            st.write("You have no upcoming meetings.")
+
+        # Display Past Meetings
+        if past_meetings:
+            st.subheader("Past Meetings", anchor=False)
+            for meeting in past_meetings:
+                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                meeting_time = f"{meeting['time']} on {meeting['date']}"
+                st.write(f"**{advisor_name}**: {meeting_time}")
+
+        else:
+            st.write("You have no past meetings.")
 
     # Tab 5: View Info & Delete Account
     with tabs[4]:
-        st.header("Account Info")
+        st.header("Account Info", anchor=False)
         st.write("To view or edit your sensitive information, please re-enter your password.")
         
         # Ensure the user is logged in and their _id is available
