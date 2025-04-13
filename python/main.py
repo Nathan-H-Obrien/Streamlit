@@ -5,6 +5,7 @@ from calculator import calculator_page
 from meetings import meetings_page
 from user_management import user_management_page
 from stocks import stock_page
+from advisor import advisor_management_page
 
 # Set page configuration
 st.set_page_config(
@@ -20,10 +21,11 @@ def main_page():
         "🧮 Calculator": calculator_page,
         "💻 Meetings": meetings_page,
         "📈 Stocks": stock_page,
-        "👤 User Management": user_management_page,
-        
-        "🔒 Logout": logout_page,
     }
+    if st.session_state.subscription_type != "Advisor":
+        PAGES["👤 User Management"] = user_management_page
+    if st.session_state.subscription_type == "Advisor":
+        PAGES["👤 Advisor Management"] = advisor_management_page
 
     st.sidebar.title('What can we help you with today?')
 
@@ -36,6 +38,16 @@ def main_page():
         for page_name in PAGES.keys():
             if st.sidebar.button(page_name):
                 st.session_state.page_selection = page_name
+
+        # Separator line
+        st.sidebar.markdown("""---""")
+
+        # Empty space placeholder for alignment
+        bottom_placeholder = st.sidebar.empty()
+
+        # Logout button at the bottom
+        if bottom_placeholder.button("🔒 Logout"):
+            logout_page()
 
     # Display the selected page
         page = PAGES[st.session_state.page_selection]

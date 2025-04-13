@@ -97,7 +97,7 @@ def meetings_page():
     st.header('Meetings Page')
     st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
 
-    if subscription_type != "Elite":
+    if subscription_type == "Basic":
         st.warning("Only Elite users have access to meetings with personal advisors.")
         if st.button("Upgrade to Elite Subscription here!", use_container_width=True):
             st.session_state.page_selection = "👤 User Management"
