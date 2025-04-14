@@ -14,7 +14,6 @@ users_collection = db["users"]  # Collection for storing user credentials
 def register_page():
     def check_password(password):
         if len(password) < 8:
-            st.write("Invalid password")
             return False
 
         has_upper_case = bool(re.search(r'[A-Z]', password))
@@ -23,7 +22,6 @@ def register_page():
         has_non_alphas = bool(re.search(r'\W', password))
 
         if sum([has_upper_case, has_lower_case, has_numbers, has_non_alphas]) < 3:
-            st.write("Invalid password")
             st.write("Password must contain at least 3 of the following:")
             st.write("Uppercase letter, lowercase letter, number, special character")
             return False
@@ -53,7 +51,13 @@ def register_page():
             elif password != password_confirm:
                 st.error("Passwords do not match")
             elif not check_password(password):
-                st.error("Invalid password")
+                st.error("""
+                Password must contain at least **3 of the following**:
+                - Uppercase letter
+                - Lowercase letter
+                - Number
+                - Special character
+                """)
             else:
                 existing_user = users_collection.find_one({"email": email})
                 if existing_user:
