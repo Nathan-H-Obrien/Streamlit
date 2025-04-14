@@ -4,7 +4,7 @@ from news import news_section
 
 def home_page():
     st.session_state.password_verified = False
-    st.title('WealthWise Financial')
+    st.title('WealthWise Financial', anchor=False)
 
-    st.write('Welcome to WealthWise Financials! We help you make better financial decisions.')
+    st.write('Welcome to WealthWise Financial! We help you make better financial decisions.')
     news_section()

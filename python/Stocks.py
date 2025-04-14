@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 def stock_page():
     st.session_state.password_verified = False
-    st.title("Stocks")
+    st.title("Stocks", anchor=False)
 
     symbol = st.text_input("Enter a stock symbol (e.g., AAPL)")
 
@@ -28,7 +28,7 @@ def stock_page():
                 market_cap = f"{market_cap:,}"  # Adds commas for thousands, millions, etc.
 
             # Display important company details
-            st.subheader(f"Company Profile for {symbol}")
+            st.subheader(f"Company Profile for {symbol}", anchor=False)
             st.write(f"**Company Name**: {company_info.get('longName', 'N/A')}")
             st.write(f"**Sector**: {company_info.get('sector', 'N/A')}")
             st.write(f"**Industry**: {company_info.get('industry', 'N/A')}")
@@ -85,7 +85,7 @@ def stock_page():
             st.error(f"Error fetching last trade: {e}")
 
     # Trend Graph Section: Plotting historical data
-    st.subheader("Market Trends (Historical Data)")
+    st.subheader("Market Trends (Historical Data)", anchor=False)
 
     # Fetch historical data (last 30 days as an example)
     historical_data = ticker.history(period="30d")  # You can adjust this to 1d, 5d, 1mo, 1y, etc.

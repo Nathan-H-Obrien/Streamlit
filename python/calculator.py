@@ -5,14 +5,14 @@ import pandas as pd
 def calculator_page():
     st.session_state.password_verified = False
     """Displays the calculator page with options for Loan and Investment calculators."""
-    st.title('Financial Calculator')
+    st.title('Financial Calculator', anchor=False)
 
     # Dropdown to select the type of calculator
     calculator = st.selectbox('Choose a calculator:', ['Investment', 'Loan'])
 
     # Loan Calculator
     if calculator == 'Loan':
-        st.header('Loan Calculator')
+        st.header('Loan Calculator', anchor=False)
 
         # Input fields for loan details
         loan_amount = st.number_input('Loan Amount ($)', min_value=0.00, value=1000.00, step=100.00)
@@ -72,16 +72,16 @@ def calculator_page():
             df = pd.DataFrame(monthly_data)
 
             # Display the table in a scrollable format
-            st.subheader('Payment Breakdown')
+            st.subheader('Payment Breakdown', anchor=False)
             st.dataframe(df, height=400)
 
             # Display total payment and interest
-            st.subheader('Summary')
+            st.subheader('Summary', anchor=False)
             st.write(f"**Total Payment:** ${total_payment:.2f}")
             st.write(f"**Total Interest Paid:** ${total_interest:.2f}")
 
             # Plot the graph for remaining loan balance
-            st.subheader('Remaining Loan Balance Over Time')
+            st.subheader('Remaining Loan Balance Over Time', anchor=False)
             plt.figure(figsize=(10, 5))
             plt.plot(months, remaining_balances, marker='o', linestyle='-', color='r')
             plt.title('Remaining Loan Balance Over Time')
@@ -92,7 +92,7 @@ def calculator_page():
 
     # Investment Calculator
     elif calculator == 'Investment':
-        st.header('Investment Calculator')
+        st.header('Investment Calculator', anchor=False)
 
         # Input fields for investment details
         investment_amount = st.number_input('Initial Investment Amount ($)', min_value=0, value=1000, step=100)
@@ -128,15 +128,15 @@ def calculator_page():
             df = pd.DataFrame(yearly_data)
 
             # Display the table in a scrollable format
-            st.subheader('Yearly Breakdown')
+            st.subheader('Yearly Breakdown', anchor=False)
             st.dataframe(df, height=400)
 
             # Display final investment value
-            st.subheader('Summary')
+            st.subheader('Summary', anchor=False)
             st.write(f"**Total Value After {investment_term_years} Years:** ${total_investment:.2f}")
 
             # Plot the graph
-            st.subheader('Interest Earned Over Time')
+            st.subheader('Interest Earned Over Time', anchor=False)
             plt.figure(figsize=(10, 5))
             plt.plot(years, yearly_interest, marker='o', linestyle='-', color='b')
             plt.title('Yearly Interest Earned')

@@ -88,7 +88,7 @@ def user_management_page():
         else:
             st.info("Upgrade to Elite for $100/year to unlock all features.")
 
-            st.subheader("Upgrade to Elite")
+            st.subheader("Upgrade to Elite", anchor=False)
             if st.button("Upgrade Now for $100/year"):
                 today = datetime.now()
                 end_date = today + timedelta(days=365)
@@ -104,13 +104,68 @@ def user_management_page():
                 st.success(f"Subscription upgraded to Elite! Valid until {end_date.strftime('%B %d, %Y')}.")
                 st.rerun()
 
-    # Tab 2: Chat with Advisor
+    # Tab 2 Chat with Advisor
     with tabs[1]:
         st.header("Chat with Advisor", anchor=False)
         st.write("Start a conversation with your advisor.")
-        # Add chat functionality here
 
-        # Tab 3: Manage Portfolio
+        if "user_id" not in st.session_state:
+            st.error("You must be logged in to chat with your advisor.")
+            st.stop()
+
+        messages_collection = db["messages"]
+
+        user_id = st.session_state.user_id
+
+        # Get advisor list (only Advisor subscription type)
+        advisors = list(users_collection.find({"subscription": "Advisor"}))
+        if not advisors:
+            st.warning("No advisors available right now.")
+        else:
+            advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
+            advisor_id = st.selectbox(
+                "Select Advisor",
+                options=list(advisor_options.keys()),
+                format_func=lambda x: advisor_options[x]
+            )
+
+            st.subheader("Chat History", anchor=False)
+
+            # Fetch conversation between this user and selected advisor
+            messages = messages_collection.find({
+                "customerId": user_id,
+                "advisorId": advisor_id
+            }).sort("timestamp", 1)
+
+            for msg in messages:
+                sender = "You" if msg["sender"] == "user" else advisor_options.get(msg["advisorId"], "Advisor")
+                timestamp = datetime.strptime(msg["timestamp"], "%Y-%m-%dT%H:%M:%S")
+                if msg["sender"] == "user":
+                    st.write(f"**🟢 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
+                else:
+                    st.write(f"**💬 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
+
+            st.write("---")
+
+            # Message input form
+            with st.form("chat_form"):
+                message_text = st.text_input("Your message:")
+                submitted = st.form_submit_button("Send")
+
+                if submitted and message_text.strip():
+                    messages_collection.insert_one({
+                        "customerId": user_id,
+                        "advisorId": advisor_id,
+                        "sender": "user",
+                        "message": message_text.strip(),
+                        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+                    })
+                    st.success("Message sent!")
+                    st.rerun()
+
+
+
+    # Tab 3: Manage Portfolio
     with tabs[2]:
         st.header("Manage Portfolio", anchor=False)
         
