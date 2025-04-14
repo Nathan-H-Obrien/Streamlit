@@ -1,3 +1,5 @@
+from bson import ObjectId
+from pymongo import MongoClient
 import streamlit as st
 from login import login_page
 from Home import home_page
@@ -11,25 +13,35 @@ from admin import admin_management_page
 # Set page configuration
 st.set_page_config(
     page_title="WealthWise Financial",
-    page_icon="pictures/Logo.jpg",  # Use the local image
+    page_icon="pictures/Logo.jpg",
     layout="wide"
 )
+
+# MongoDB Connection
+MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
+DATABASE_NAME = "WealthWise"
+client = MongoClient(MONGO_URI)
+db = client[DATABASE_NAME]
+users_collection = db["users"]  # Collection for storing user credentials
+
+user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
 
 def main_page():
     # Define the pages
     PAGES = {
         "🏠 Home": home_page,
         "🧮 Calculator": calculator_page,
-        "💻 Meetings": meetings_page,
         "📈 Stocks": stock_page,
     }
     if st.session_state.subscription_type in ["Basic", "Elite"]:
+        PAGES["💻 Meetings"] = meetings_page
         PAGES["👤 User Management"] = user_management_page
     if st.session_state.subscription_type == "Advisor":
         PAGES["👤 Advisor Management"] = advisor_management_page
     if st.session_state.subscription_type == "Admin":
         PAGES["👤 Admin Management"] = admin_management_page
 
+    st.sidebar.title(f"Hello {user["first_name"]}!")
     st.sidebar.title('What can we help you with today?', anchor=False)
 
     if st.session_state.logged_in == True:
@@ -39,7 +51,7 @@ def main_page():
 
         # Create a button for each page
         for page_name in PAGES.keys():
-            if st.sidebar.button(page_name):
+            if st.sidebar.button(page_name, use_container_width=True):
                 st.session_state.page_selection = page_name
 
         # Separator line
@@ -49,7 +61,7 @@ def main_page():
         bottom_placeholder = st.sidebar.empty()
 
         # Logout button at the bottom
-        if bottom_placeholder.button("🔒 Logout"):
+        if bottom_placeholder.button("🔒 Logout", use_container_width=True):
             logout_page()
 
     # Display the selected page
