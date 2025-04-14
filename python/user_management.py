@@ -11,10 +11,11 @@ MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
 DATABASE_NAME = "WealthWise"
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
-users_collection = db["users"]  # Collection for storing user credentials
+users_collection = db["users"]
 portfolios_collection = db["portfolios"]
 meetings_collection = db["appointments"]
 advisors_collection = db["advisors"]
+messages_collection = db["messages"]
 
 def check_password(password):
     if len(password) < 8:
@@ -112,8 +113,6 @@ def user_management_page():
         if "user_id" not in st.session_state:
             st.error("You must be logged in to chat with your advisor.")
             st.stop()
-
-        messages_collection = db["messages"]
 
         user_id = st.session_state.user_id
 
