@@ -37,23 +37,22 @@ def get_weekday_dates(num_days=30):
 
 @st.dialog("Schedule Meeting")
 def schedule_meeting(advisor_options, user_id):
-    # Select advisor and date outside the form so they update time slots in real-time
     advisor_id = st.selectbox("Select Advisor", options=list(advisor_options.keys()), format_func=lambda x: advisor_options[x])
     weekday_options = get_weekday_dates()
     date = st.selectbox("Select Date", options=weekday_options, format_func=lambda d: d.strftime("%A, %B %d, %Y"))
 
-
     time_str = None
 
     if advisor_id and date:
-        # Fetch existing appointments for this advisor on this date
         existing_appointments = meetings_collection.find({
             "advisorId": advisor_id,
-            "date": str(date)
+            "scheduled_at": {
+                "$gte": datetime.datetime.combine(date, datetime.time(0, 0)),
+                "$lt": datetime.datetime.combine(date, datetime.time(23, 59))
+            }
         })
-        booked_times = {m["time"] for m in existing_appointments}
+        booked_times = {m["scheduled_at"].strftime("%I:%M %p") for m in existing_appointments}
 
-        # Generate time slots: 10:00 AM – 2:00 PM in 30-minute steps
         start_hour = 10
         end_hour = 14
         interval_minutes = 30
@@ -71,20 +70,22 @@ def schedule_meeting(advisor_options, user_id):
         else:
             st.info("No available times for this advisor on the selected date.")
 
-    # Now the form only wraps the submit button
     with st.form(key="schedule_meeting_form", border=False):
         submit = st.form_submit_button("Schedule Meeting")
 
         if submit and advisor_id and time_str:
+            # Combine selected date and time into a single datetime
+            scheduled_at = datetime.datetime.strptime(f"{date} {time_str}", "%Y-%m-%d %I:%M %p")
+
             meeting_data = {
                 "customerId": user_id,
                 "advisorId": advisor_id,
-                "date": str(date),
-                "time": time_str
+                "scheduled_at": scheduled_at
             }
             meetings_collection.insert_one(meeting_data)
             st.success("Meeting scheduled successfully!")
             st.rerun()
+
 
 def meetings_page():
     st.session_state.password_verified = False
@@ -105,27 +106,15 @@ def meetings_page():
             st.rerun()
         return
 
-
     now = datetime.datetime.now()
 
-    # Get all meetings for this user
-    all_meetings = meetings_collection.find({"customerId": user_id})
+    # Get all future meetings for this user
+    all_meetings = meetings_collection.find({
+        "customerId": user_id,
+        "scheduled_at": {"$gte": now}
+    }).sort("scheduled_at", 1)
 
-    # Filter to only future meetings
-    meetings = []
-    for m in all_meetings:
-        meeting_dt = datetime.datetime.strptime(f"{m['date']} {m['time']}", "%Y-%m-%d %I:%M %p")
-        if meeting_dt > now:
-            meetings.append(m)
-
-    # Sort from soonest to farthest
-    meetings.sort(key=lambda m: datetime.datetime.strptime(f"{m['date']} {m['time']}", "%Y-%m-%d %I:%M %p"))
-
-    # Sort meetings by soonest
-    def get_meeting_datetime(meeting):
-        return datetime.datetime.strptime(f"{meeting['date']} {meeting['time']}", "%Y-%m-%d %I:%M %p")
-
-    meetings.sort(key=get_meeting_datetime)
+    meetings = list(all_meetings)
 
     advisors = list(users_collection.find({"subscription": "Advisor"}))
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
@@ -137,8 +126,8 @@ def meetings_page():
     if meetings:
         tableData = {
             'Advisor Name': [advisor_options.get(m['advisorId'], m['advisorId']) for m in meetings],
-            'Date': [datetime.datetime.strptime(m['date'], "%Y-%m-%d").strftime("%B %d, %Y") for m in meetings],
-            'Time': [m['time'] for m in meetings]
+            'Date': [m['scheduled_at'].strftime("%B %d, %Y") for m in meetings],
+            'Time': [m['scheduled_at'].strftime("%I:%M %p") for m in meetings]
         }
 
         pandaTable = pd.DataFrame(data=tableData, index=[f'Meeting {i+1}' for i in range(len(meetings))])
@@ -148,3 +137,4 @@ def meetings_page():
 
     if outer_container.button('Schedule meeting'):
         schedule_meeting(advisor_options, user_id)
+

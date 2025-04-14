@@ -76,7 +76,7 @@ def advisor_management_page():
         advisor_id = st.session_state.user_id
 
         # Fetch meetings for this advisor
-        meetings = list(meetings_collection.find({"advisorId": advisor_id}).sort("datetime", 1))
+        meetings = list(meetings_collection.find({"advisorId": advisor_id}).sort("scheduled_at", 1))
 
         if not meetings:
             st.write("No meetings scheduled.")
@@ -87,11 +87,10 @@ def advisor_management_page():
                 customer_name = f"{customer['first_name']} {customer['last_name']}" if customer else "Unknown User"
 
                 # Format datetime
-                meeting_time = meeting["time"]
-                meeting_date = meeting["date"]
+                meeting_time = meeting["scheduled_at"].strftime("%B %d, %Y at %I:%M %p")
 
                 # Display meeting info
-                st.write(f"**{customer_name}:** {meeting_date} at {meeting_time}")
+                st.write(f"**{customer_name}:** {meeting_time}")
                 st.write("---")
 
 

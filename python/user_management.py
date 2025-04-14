@@ -240,9 +240,6 @@ def user_management_page():
 
     # Tab 4: View Events/Meetings
     with tabs[3]:
-        st.header("View Events/Meetings", anchor=False)
-        st.write("View your registered events or scheduled meetings.")
-
         if "user_id" not in st.session_state:
             st.error("You must be logged in to view your meetings.")
             st.stop()
@@ -260,42 +257,50 @@ def user_management_page():
         current_date = datetime.now()
 
         # Separate meetings into past and future
+
+        # Prepare lists
         past_meetings = []
         future_meetings = []
-        
+
+        # Current datetime
+        current_datetime = datetime.now()
+
+        # Classify meetings
         for meeting in meetings:
-            # Convert stored date string to a datetime object
-            meeting_date = datetime.strptime(meeting["date"], "%Y-%m-%d")
-            
-            # Check if the meeting is in the past or future
-            if meeting_date < current_date:
+            scheduled_datetime = meeting["scheduled_at"]
+
+            if scheduled_datetime < current_datetime:
                 past_meetings.append(meeting)
             else:
                 future_meetings.append(meeting)
 
-        # Display Future Meetings
-        if future_meetings:
+        # Create two columns
+        col1, col2 = st.columns(2, border=True)
+
+        # Future Meetings (left)
+        with col1:
             st.subheader("Future Meetings", anchor=False)
-            for meeting in future_meetings:
-                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
-                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
-                meeting_time = f"{meeting['time']} on {meeting['date']}"
-                st.write(f"**{advisor_name}**: {meeting_time}")
+            if future_meetings:
+                for meeting in future_meetings:
+                    advisor = users_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                    advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                    meeting_time = meeting["scheduled_at"].strftime("%B %d, %Y at %I:%M %p")
+                    st.write(f"**{advisor_name}**: {meeting_time}")
+            else:
+                st.write("No upcoming meetings.")
 
-        else:
-            st.write("You have no upcoming meetings.")
-
-        # Display Past Meetings
-        if past_meetings:
+        # Past Meetings (right)
+        with col2:
             st.subheader("Past Meetings", anchor=False)
-            for meeting in past_meetings:
-                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
-                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
-                meeting_time = f"{meeting['time']} on {meeting['date']}"
-                st.write(f"**{advisor_name}**: {meeting_time}")
+            if past_meetings:
+                for meeting in past_meetings:
+                    advisor = users_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                    advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                    meeting_time = meeting["scheduled_at"].strftime("%B %d, %Y at %I:%M %p")
+                    st.write(f"**{advisor_name}**: {meeting_time}")
+            else:
+                st.write("No past meetings.")
 
-        else:
-            st.write("You have no past meetings.")
 
     # Tab 5: View Info & Delete Account
     with tabs[4]:
