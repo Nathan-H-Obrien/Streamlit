@@ -6,9 +6,10 @@ from Home import home_page
 from calculator import calculator_page
 from meetings import meetings_page
 from user_management import user_management_page
-from Stocks import stock_page
 from advisor import advisor_management_page
 from admin import admin_management_page
+from chat import chat_page
+from portfolio import portfolio_page
 
 # Set page configuration
 st.set_page_config(
@@ -30,11 +31,12 @@ def main_page():
     # Define the pages
     PAGES = {
         "🏠 Home": home_page,
-        "🧮 Calculator": calculator_page,
-        "📈 Stocks": stock_page,
+        "🧮 Calculators": calculator_page,
     }
     if st.session_state.subscription_type in ["Basic", "Elite"]:
+        PAGES["📈 Manage Portfolio"] = portfolio_page
         PAGES["💻 Meetings"] = meetings_page
+        PAGES["💬 Chat with Advisor"] = chat_page
         PAGES["👤 User Management"] = user_management_page
     if st.session_state.subscription_type == "Advisor":
         PAGES["👤 Advisor Management"] = advisor_management_page

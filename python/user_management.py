@@ -3,7 +3,6 @@ from pymongo import MongoClient
 from hashlib import sha256
 from bson.objectid import ObjectId  # Import ObjectId for querying MongoDB
 import re
-import yfinance as yf
 from datetime import datetime, timedelta
 
 # MongoDB Connection
@@ -12,10 +11,23 @@ DATABASE_NAME = "WealthWise"
 client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["users"]
-portfolios_collection = db["portfolios"]
 meetings_collection = db["appointments"]
 advisors_collection = db["advisors"]
 messages_collection = db["messages"]
+
+@st.dialog("Confirm Delete")
+def delete_account():
+    st.write("Are you sure you want to delete your account? This action is permanent.")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Yes, Delete", type="primary", use_container_width=True):
+            users_collection.delete_one({"_id": ObjectId(st.session_state.user_id)})
+            st.success("Your account has been deleted.")
+            st.session_state.clear()
+            st.rerun()
+    with col2:
+        if st.button("Cancel", use_container_width=True):
+            st.rerun()
 
 def check_password(password):
     if len(password) < 8:
@@ -39,9 +51,7 @@ def user_management_page():
     
     # Create tabs
     tabs = st.tabs([
-        "Payment & Subscription", 
-        "Chat with Advisor", 
-        "Manage Portfolio", 
+        "Payment & Subscription",
         "View Events/Meetings",
         "View Info & Delete Account"
     ])
@@ -103,219 +113,85 @@ def user_management_page():
                     }}
                 )
                 st.success(f"Subscription upgraded to Elite! Valid until {end_date.strftime('%B %d, %Y')}.")
-                st.rerun()
+                st.rerun()     
 
-    # Tab 2 Chat with Advisor
+    # Tab 2: View Events/Meetings
     with tabs[1]:
-        st.header("Chat with Advisor", anchor=False)
-        st.write("Start a conversation with your advisor.")
-
-        if "user_id" not in st.session_state:
-            st.error("You must be logged in to chat with your advisor.")
-            st.stop()
-
-        user_id = st.session_state.user_id
-
-        # Get advisor list (only Advisor subscription type)
-        advisors = list(users_collection.find({"subscription": "Advisor"}))
-        if not advisors:
-            st.warning("No advisors available right now.")
-        else:
-            advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
-            advisor_id = st.selectbox(
-                "Select Advisor",
-                options=list(advisor_options.keys()),
-                format_func=lambda x: advisor_options[x]
-            )
-
-            st.subheader("Chat History", anchor=False)
-
-            # Fetch conversation between this user and selected advisor
-            messages = messages_collection.find({
-                "customerId": user_id,
-                "advisorId": advisor_id
-            }).sort("timestamp", 1)
-
-            for msg in messages:
-                sender = "You" if msg["sender"] == "user" else advisor_options.get(msg["advisorId"], "Advisor")
-                timestamp = datetime.strptime(msg["timestamp"], "%Y-%m-%dT%H:%M:%S")
-                if msg["sender"] == "user":
-                    st.write(f"**🟢 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
-                else:
-                    st.write(f"**💬 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
-
-            st.write("---")
-
-            # Message input form
-            with st.form("chat_form"):
-                message_text = st.text_input("Your message:")
-                submitted = st.form_submit_button("Send")
-
-                if submitted and message_text.strip():
-                    messages_collection.insert_one({
-                        "customerId": user_id,
-                        "advisorId": advisor_id,
-                        "sender": "user",
-                        "message": message_text.strip(),
-                        "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
-                    })
-                    st.success("Message sent!")
-                    st.rerun()
-
-
-
-    # Tab 3: Manage Portfolio
-    with tabs[2]:
-        st.header("Manage Portfolio", anchor=False)
-        
-        if "user_id" not in st.session_state:
-            st.error("You must be logged in to manage your portfolio.")
-            st.stop()
-
-        user_id = ObjectId(st.session_state.user_id)
-
-        # Fetch or initialize portfolio
-        portfolio = portfolios_collection.find_one({"user_id": user_id})
-        if not portfolio:
-            portfolios_collection.insert_one({"user_id": user_id, "holdings": {}})
-            portfolio = {"holdings": {}}
-
-        holdings = portfolio.get("holdings", {})
-
-        # Helper function to get live price
-        def get_live_price(ticker):
-            try:
-                stock = yf.Ticker(ticker)
-                live_price = stock.history(period='1d')['Close'].iloc[-1]
-                return live_price
-            except:
-                return None
-
-        # Display current holdings with live prices
-        st.subheader("Current Holdings", anchor=False)
-        if holdings:
-            for stock, qty in holdings.items():
-                live_price = get_live_price(stock)
-                if live_price:
-                    total_value = qty * live_price
-                    st.write(f"**{stock}**: {qty} shares @ \${live_price:.2f} (Total: \${total_value:.2f})")
-                else:
-                    st.write(f"**{stock}**: {qty} shares (Live price unavailable)")
-        else:
-            st.write("You don't have any holdings yet.")
-
-        # Form to add/remove stocks
-        st.subheader("Update Holdings", anchor=False)
-        with st.form("update_portfolio"):
-            stock_symbol = st.text_input("Stock Symbol (e.g., AAPL)").upper().strip()
-            quantity = st.number_input("Quantity", min_value=0.0, step=0.01, format="%.2f", placeholder=0.0)
-            action = st.radio("Action", ["Add", "Remove"])
-            submit = st.form_submit_button("Update Portfolio")
-
-            if submit:
-                if not stock_symbol:
-                    st.error("Stock symbol cannot be empty.")
-                else:
-                    updated_qty = holdings.get(stock_symbol, 0)
-                    if action == "Add":
-                        updated_qty += quantity
-                    elif action == "Remove":
-                        if quantity > updated_qty:
-                            st.error(f"You only own {updated_qty} shares of {stock_symbol}. Cannot remove more.")
-                            st.stop()
-                        updated_qty -= quantity
-
-                    if updated_qty > 0:
-                        holdings[stock_symbol] = updated_qty
-                    elif stock_symbol in holdings:
-                        del holdings[stock_symbol]
-
-                    portfolios_collection.update_one(
-                        {"user_id": user_id},
-                        {"$set": {"holdings": holdings}}
-                    )
-                    st.success(f"Portfolio updated! {stock_symbol}: {updated_qty} shares")
-                    st.rerun()
-
-
-    # Tab 4: View Events/Meetings
-    with tabs[3]:
-        st.header("View Events/Meetings", anchor=False)
-        st.write("View your registered events or scheduled meetings.")
+        meetings = []
 
         if "user_id" not in st.session_state:
             st.error("You must be logged in to view your meetings.")
             st.stop()
 
         user_id = st.session_state.user_id
+        user = users_collection.find_one({"_id": ObjectId(user_id)})
 
-        # Fetch all meetings for the user
-        meetings = list(meetings_collection.find({"customerId": user_id}))
+        if (user.get("subscription") == "Basic"):
+            st.error("Only Elite users can schedule meetings.")
 
-        if not meetings:
-            st.write("You have no scheduled meetings.")
-            return
+        else:
+            # Fetch all meetings for the user
+            meetings = list(meetings_collection.find({"customerId": user_id}))
 
-        # Get current date to compare with meeting dates
-        current_date = datetime.now()
-
-        # Separate meetings into past and future
+        # Prepare lists
         past_meetings = []
         future_meetings = []
-        
+
+        # Current datetime
+        current_datetime = datetime.now()
+
+        # Classify meetings
         for meeting in meetings:
-            # Convert stored date string to a datetime object
-            meeting_date = datetime.strptime(meeting["date"], "%Y-%m-%d")
-            
-            # Check if the meeting is in the past or future
-            if meeting_date < current_date:
+            scheduled_datetime = meeting["scheduled_at"]
+
+            if scheduled_datetime < current_datetime:
                 past_meetings.append(meeting)
             else:
                 future_meetings.append(meeting)
 
-        # Display Future Meetings
-        if future_meetings:
+        # Create two columns
+        col1, col2 = st.columns(2, border=True)
+
+        # Future Meetings (left)
+        with col1:
             st.subheader("Future Meetings", anchor=False)
-            for meeting in future_meetings:
-                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
-                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
-                meeting_time = f"{meeting['time']} on {meeting['date']}"
-                st.write(f"**{advisor_name}**: {meeting_time}")
+            if future_meetings:
+                for meeting in future_meetings:
+                    advisor = users_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                    advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                    meeting_time = meeting["scheduled_at"].strftime("%B %d, %Y at %I:%M %p")
+                    st.write(f"**{advisor_name}**: {meeting_time}")
+            else:
+                st.write("No upcoming meetings.")
 
-        else:
-            st.write("You have no upcoming meetings.")
-
-        # Display Past Meetings
-        if past_meetings:
+        # Past Meetings (right)
+        with col2:
             st.subheader("Past Meetings", anchor=False)
-            for meeting in past_meetings:
-                advisor = advisors_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
-                advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
-                meeting_time = f"{meeting['time']} on {meeting['date']}"
-                st.write(f"**{advisor_name}**: {meeting_time}")
+            if past_meetings:
+                for meeting in past_meetings:
+                    advisor = users_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
+                    advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+                    meeting_time = meeting["scheduled_at"].strftime("%B %d, %Y at %I:%M %p")
+                    st.write(f"**{advisor_name}**: {meeting_time}")
+            else:
+                st.write("No past meetings.") 
 
-        else:
-            st.write("You have no past meetings.")
-
-    # Tab 5: View Info & Delete Account
-    with tabs[4]:
+    # Tab 3: View Info & Delete Account
+    with tabs[2]:
         st.header("Account Info", anchor=False)
-        st.write("To view or edit your sensitive information, please re-enter your password.")
-        
-        # Ensure the user is logged in and their _id is available
+        if (st.session_state.password_verified == False):
+            st.write("To view or edit your sensitive information, please re-enter your password.")
+
         if "user_id" not in st.session_state:
             st.error("You must be logged in to view this page.")
-            return
-        
-        # Initialize session state for password verification
+            st.stop()
+
         if "password_verified" not in st.session_state:
             st.session_state.password_verified = False
-        
+
         if not st.session_state.password_verified:
-            # Password input for verification
             password = st.text_input("Enter your password", type="password")
             if st.button("Verify Password"):
-                # Verify the entered password
                 hashed_password = sha256(password.encode()).hexdigest()
                 try:
                     user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
@@ -326,11 +202,10 @@ def user_management_page():
                 if user and hashed_password == user["password"]:
                     st.success("Password verified!")
                     st.session_state.password_verified = True
-                    st.rerun()  # Force the app to refresh and show the editable fields
+                    st.rerun()
                 else:
                     st.error("Incorrect password. Please try again.")
         else:
-            # Query the database for the user's information
             try:
                 user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
             except Exception as e:
@@ -340,41 +215,55 @@ def user_management_page():
             if not user:
                 st.error("User not found.")
                 return
-            
-            # Display user information
-            st.write(f"First Name: {user.get('first_name', 'N/A')}")
-            st.write(f"Last Name: {user.get('last_name', 'N/A')}")
-            st.write(f"Email: {user.get('email', 'N/A')}")
-            
-            # Editable fields
-            first_name = st.text_input("Edit First Name", value=user.get("first_name", ""))
-            last_name = st.text_input("Edit Last Name", value=user.get("last_name", ""))
-            email = st.text_input("Edit Email", value=user.get("email", ""))
-            new_password = st.text_input("Edit Password", type="password")
-            password_confirm = st.text_input("Confirm New Password", type="password")
-            
-            if st.button("Save Changes"):
-                # Error checking
-                if not first_name or not last_name or not email or not new_password:
-                    st.error("All fields are required.")
-                elif "@" not in email:
-                    st.error("Invalid email address.")
-                elif new_password != password_confirm:
-                    st.error("Passwords do not match")
-                elif not check_password(new_password):
-                    st.error("Invalid password")
-                else:
-                    # Hash the new password
-                    hashed_new_password = sha256(new_password.encode()).hexdigest()
-                    
-                    # Update the user's information in the database
-                    users_collection.update_one(
-                        {"_id": ObjectId(st.session_state.user_id)},
-                        {"$set": {
-                            "first_name": first_name,
-                            "last_name": last_name,
-                            "email": email,
-                            "password": hashed_new_password
-                        }}
-                    )
-                    st.success("Changes saved successfully!")
+
+            st.write(f"**First Name:** {user.get('first_name', 'N/A')}")
+            st.write(f"**Last Name:** {user.get('last_name', 'N/A')}")
+            st.write(f"**Email:** {user.get('email', 'N/A')}")
+
+            st.write("---")
+            st.subheader("Edit Information")
+
+            with st.form("edit_account_form"):
+                new_first_name = st.text_input("New First Name", value="")
+                new_last_name = st.text_input("New Last Name", value="")
+                new_email = st.text_input("New Email", value="")
+                new_password = st.text_input("New Password", type="password")
+                password_confirm = st.text_input("Confirm New Password", type="password")
+                submitted = st.form_submit_button("Save Changes")
+
+                if submitted:
+                    updates = {}
+
+                    if new_first_name.strip():
+                        updates["first_name"] = new_first_name.strip()
+                    if new_last_name.strip():
+                        updates["last_name"] = new_last_name.strip()
+                    if new_email.strip():
+                        if "@" not in new_email:
+                            st.error("Invalid email address.")
+                            st.stop()
+                        updates["email"] = new_email.strip()
+                    if new_password.strip():
+                        if new_password != password_confirm:
+                            st.error("Passwords do not match.")
+                            st.stop()
+                        elif not check_password(new_password):
+                            st.error("Invalid password.")
+                            st.stop()
+                        else:
+                            updates["password"] = sha256(new_password.encode()).hexdigest()
+
+                    if updates:
+                        users_collection.update_one(
+                            {"_id": ObjectId(st.session_state.user_id)},
+                            {"$set": updates}
+                        )
+                        st.success("Changes saved successfully!")
+                        st.rerun()
+                    else:
+                        st.warning("No changes to save.")
+
+            st.write("---")
+            st.subheader("Danger Zone")
+            if st.button("Delete Account", type="primary"):
+                delete_account()

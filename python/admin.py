@@ -52,9 +52,15 @@ def admin_management_page():
         for meeting in meetings:
             advisor = users_collection.find_one({"_id": ObjectId(meeting["advisorId"])})
             customer = users_collection.find_one({"_id": ObjectId(meeting["customerId"])})
-            st.write(f"**Advisor:** {advisor['first_name']} {advisor['last_name'] if advisor else 'Unknown'}")
-            st.write(f"**Customer:** {customer['first_name']} {customer['last_name'] if customer else 'Unknown'}")
-            st.write(f"**Date & Time:** {meeting['date']} {meeting['time']}")
+
+            advisor_name = f"{advisor['first_name']} {advisor['last_name']}" if advisor else "Unknown Advisor"
+            customer_name = f"{customer['first_name']} {customer['last_name']}" if customer else "Unknown Customer"
+
+            scheduled_time = meeting['scheduled_at'].strftime("%B %d, %Y at %I:%M %p")
+
+            st.write(f"**Advisor:** {advisor_name}")
+            st.write(f"**Customer:** {customer_name}")
+            st.write(f"**Date & Time:** {scheduled_time}")
             st.write("---")
 
     # Tab 3: All Messages

@@ -1,10 +1,92 @@
+from datetime import datetime, timedelta
+from bson import ObjectId
+from pymongo import MongoClient
 import streamlit as st
 import yfinance as yf
-from datetime import datetime, timedelta
 
-def stock_page():
-    st.session_state.password_verified = False
-    st.title("Stocks", anchor=False)
+# MongoDB Connection
+MONGO_URI = "mongodb+srv://sambuerck:addadd54@meanexample.uod5c.mongodb.net/"
+DATABASE_NAME = "WealthWise"
+client = MongoClient(MONGO_URI)
+db = client[DATABASE_NAME]
+users_collection = db["users"]
+portfolios_collection = db["portfolios"]
+
+
+def portfolio_page():
+    st.header("Manage Portfolio", anchor=False)
+    
+    if "user_id" not in st.session_state:
+        st.error("You must be logged in to manage your portfolio.")
+        st.stop()
+
+    user_id = ObjectId(st.session_state.user_id)
+
+    # Fetch or initialize portfolio
+    portfolio = portfolios_collection.find_one({"user_id": user_id})
+    if not portfolio:
+        portfolios_collection.insert_one({"user_id": user_id, "holdings": {}})
+        portfolio = {"holdings": {}}
+
+    holdings = portfolio.get("holdings", {})
+
+    # Helper function to get live price
+    def get_live_price(ticker):
+        try:
+            stock = yf.Ticker(ticker)
+            live_price = stock.history(period='1d')['Close'].iloc[-1]
+            return live_price
+        except:
+            return None
+
+    # Display current holdings with live prices
+    st.subheader("Current Holdings", anchor=False)
+    if holdings:
+        for stock, qty in holdings.items():
+            live_price = get_live_price(stock)
+            if live_price:
+                total_value = qty * live_price
+                st.write(f"**{stock}**: {qty} shares @ \${live_price:.2f} (Total: \${total_value:.2f})")
+            else:
+                st.write(f"**{stock}**: {qty} shares (Live price unavailable)")
+    else:
+        st.write("You don't have any holdings yet.")
+
+    # Form to add/remove stocks
+    st.subheader("Update Holdings", anchor=False)
+    with st.form("update_portfolio"):
+        stock_symbol = st.text_input("Stock Symbol (e.g., AAPL)").upper().strip()
+        quantity = st.number_input("Quantity", min_value=0.0, step=0.01, format="%.2f", placeholder=0.0)
+        action = st.radio("Action", ["Add", "Remove"])
+        submit = st.form_submit_button("Update Portfolio")
+
+        if submit:
+            if not stock_symbol:
+                st.error("Stock symbol cannot be empty.")
+            else:
+                updated_qty = holdings.get(stock_symbol, 0)
+                if action == "Add":
+                    updated_qty += quantity
+                elif action == "Remove":
+                    if quantity > updated_qty:
+                        st.error(f"You only own {updated_qty} shares of {stock_symbol}. Cannot remove more.")
+                        st.stop()
+                    updated_qty -= quantity
+
+                if updated_qty > 0:
+                    holdings[stock_symbol] = updated_qty
+                elif stock_symbol in holdings:
+                    del holdings[stock_symbol]
+
+                portfolios_collection.update_one(
+                    {"user_id": user_id},
+                    {"$set": {"holdings": holdings}}
+                )
+                st.success(f"Portfolio updated! {stock_symbol}: {updated_qty} shares")
+                st.rerun()
+    st.write("---")
+
+    st.subheader("Search Stocks", anchor=False)
 
     symbol = st.text_input("Enter a stock symbol (e.g., AAPL)")
 
@@ -115,4 +197,7 @@ def stock_page():
         st.warning("No historical data available for the selected symbol.")
 
     
+
+
+
 
