@@ -11,6 +11,19 @@ users_collection = db["users"]
 meetings_collection = db["appointments"]
 messages_collection = db["messages"]
 
+@st.dialog("Delete User?")
+def delete_user(user):
+    st.write("Are you sure you want to delete this user?", anchor=False)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Confirm", type="primary", use_container_width=True):
+            users_collection.delete_one({"_id": user["_id"]})
+            st.rerun()
+    with col2:
+        if st.button("Cancel", use_container_width=True):
+            st.rerun()
+
 def admin_management_page():
     st.title("Admin Management", anchor=False)
 
@@ -28,10 +41,8 @@ def admin_management_page():
             st.write(f"**Name:** {user['first_name']} {user['last_name']}")
             st.write(f"**Email:** {user['email']}")
             st.write(f"**Subscription:** {user.get('subscription')}")
-            if st.button(f"Delete {user['email']}", key=f"del_{user['_id']}"):
-                users_collection.delete_one({"_id": user["_id"]})
-                st.success(f"Deleted {user['email']}")
-                st.rerun()
+            if st.button(f"Delete {user['email']}", key=f"del_{user['_id']}", type="primary"):
+                delete_user(user)
             st.write("---")
 
     # Tab 2: All Meetings
