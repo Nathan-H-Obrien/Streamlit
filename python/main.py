@@ -6,6 +6,7 @@ from meetings import meetings_page
 from user_management import user_management_page
 from stocks import stock_page
 from advisor import advisor_management_page
+from admin import admin_management_page
 
 # Set page configuration
 st.set_page_config(
@@ -22,12 +23,14 @@ def main_page():
         "💻 Meetings": meetings_page,
         "📈 Stocks": stock_page,
     }
-    if st.session_state.subscription_type != "Advisor":
+    if st.session_state.subscription_type in ["Basic", "Elite"]:
         PAGES["👤 User Management"] = user_management_page
     if st.session_state.subscription_type == "Advisor":
         PAGES["👤 Advisor Management"] = advisor_management_page
+    if st.session_state.subscription_type == "Admin":
+        PAGES["👤 Admin Management"] = admin_management_page
 
-    st.sidebar.title('What can we help you with today?')
+    st.sidebar.title('What can we help you with today?', anchor=False)
 
     if st.session_state.logged_in == True:
         # Initialize session state for page selection

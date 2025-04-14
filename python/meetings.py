@@ -11,6 +11,7 @@ client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 meetings_collection = db["appointments"]
 advisors_collection = db["advisors"]
+users_collection = db["users"]
 
 def round_time_to_nearest_15(dt):
     new_minute = (dt.minute // 15) * 15
@@ -94,7 +95,7 @@ def meetings_page():
         st.error("You must be logged in to view meetings.")
         return
 
-    st.header('Meetings Page')
+    st.header('Meetings Page', anchor=False)
     st.write('Welcome to the meetings page where you can manage meetings with your personal advisor!')
 
     if subscription_type == "Basic":
@@ -126,7 +127,7 @@ def meetings_page():
 
     meetings.sort(key=get_meeting_datetime)
 
-    advisors = list(advisors_collection.find())
+    advisors = list(users_collection.find({"subscription": "Advisor"}))
     advisor_options = {str(a['_id']): f"{a['first_name']} {a['last_name']}" for a in advisors}
 
     outer_container = st.container(border=True)

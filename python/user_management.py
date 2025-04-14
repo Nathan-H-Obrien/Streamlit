@@ -88,7 +88,7 @@ def user_management_page():
         else:
             st.info("Upgrade to Elite for $100/year to unlock all features.")
 
-            st.subheader("Upgrade to Elite")
+            st.subheader("Upgrade to Elite", anchor=False)
             if st.button("Upgrade Now for $100/year"):
                 today = datetime.now()
                 end_date = today + timedelta(days=365)
@@ -114,7 +114,6 @@ def user_management_page():
             st.stop()
 
         messages_collection = db["messages"]
-        advisors_collection = db["users"]
 
         user_id = st.session_state.user_id
 
@@ -130,7 +129,7 @@ def user_management_page():
                 format_func=lambda x: advisor_options[x]
             )
 
-            st.subheader("Chat History")
+            st.subheader("Chat History", anchor=False)
 
             # Fetch conversation between this user and selected advisor
             messages = messages_collection.find({

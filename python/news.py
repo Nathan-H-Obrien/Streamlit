@@ -15,13 +15,13 @@ def news_section():
         if headline['title'] and headline['urlToImage'] and headline['description'] and headline['url']:
             newsArticles.append(headline)
 
-    st.subheader('Latest News')
+    st.subheader('Latest News', anchor=False)
 
     cols = []
     cols2 = []
     match(len(newsArticles)):
         case 0:
-            st.subheader('No news today! Check back tomorrow.')
+            st.subheader('No news today! Check back tomorrow.', anchor=False)
         case 1:
             cols = st.columns(1, border=True)
         case 2:
@@ -44,18 +44,18 @@ def news_section():
         if i < 3:
             with cols[i]:
                 if i == 0:
-                    st.header(newsArticles[i]['title'])
+                    st.header(newsArticles[i]['title'], anchor=False)
                 else:
-                    st.subheader(newsArticles[i]['title'])
+                    st.subheader(newsArticles[i]['title'], anchor=False)
                 st.image(newsArticles[i]['urlToImage'])
                 st.write(newsArticles[i]['description'])
                 st.write(newsArticles[i]['url'])
         if i >= 3:
             with cols2[i-3]:
                 if i == 3:
-                    st.header(newsArticles[i]['title'])
+                    st.header(newsArticles[i]['title'], anchor=False)
                 else:
-                    st.subheader(newsArticles[i]['title'])
+                    st.subheader(newsArticles[i]['title'], anchor=False)
                 st.image(newsArticles[i]['urlToImage'])
                 st.write(newsArticles[i]['description'])
                 st.write(newsArticles[i]['url'])
