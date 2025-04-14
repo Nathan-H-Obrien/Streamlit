@@ -28,24 +28,32 @@ def advisor_management_page():
 
     # Chat with Users
     with tabs[0]:
-        # Fetch distinct user IDs with messages
-        user_ids = messages_collection.distinct("customerId")
+        advisor_id = st.session_state.user_id  # Current logged-in advisor's ID
+
+        # Fetch distinct user IDs who have messaged this advisor
+        user_ids = messages_collection.distinct("customerId", {"advisorId": advisor_id})
         if not user_ids:
             st.write("No messages yet.")
             return
 
         # Select user conversation
-        selected_user_id = st.selectbox("Select a user to view their conversation:",
-                                        user_ids, format_func=lambda uid: get_user_name(uid))
+        selected_user_id = st.selectbox(
+            "Select a user to view their conversation:",
+            user_ids, 
+            format_func=lambda uid: get_user_name(uid)
+        )
 
-        # Fetch conversation messages for this user
-        messages = list(messages_collection.find({"customerId": selected_user_id}).sort("timestamp", 1))
+        # Fetch conversation messages for this user and this advisor
+        messages = list(messages_collection.find({
+            "customerId": selected_user_id,
+            "advisorId": advisor_id
+        }).sort("timestamp", 1))
 
         # Display conversation
         st.subheader("Conversation", anchor=False)
         for msg in messages:
             sender = msg.get("sender", "user")
-            if sender == "user":
+            if sender.lower() == "user":
                 st.write(f"**💬 {get_user_name(msg['customerId'])}:** {msg['message']}")
             else:
                 st.write(f"**🟢 You:** {msg['message']}")
@@ -58,12 +66,13 @@ def advisor_management_page():
             if new_message.strip() != "":
                 messages_collection.insert_one({
                     "customerId": selected_user_id,
-                    "advisorId": st.session_state.user_id,
+                    "advisorId": advisor_id,
                     "sender": "Advisor",
                     "message": new_message,
                     "timestamp": datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
                 })
                 st.rerun()
+
 
     # Scheduled Meetings (Advisor View)
     with tabs[1]:

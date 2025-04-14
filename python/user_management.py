@@ -138,11 +138,10 @@ def user_management_page():
 
             for msg in messages:
                 sender = "You" if msg["sender"] == "user" else advisor_options.get(msg["advisorId"], "Advisor")
-                timestamp = datetime.strptime(msg["timestamp"], "%Y-%m-%dT%H:%M:%S")
                 if msg["sender"] == "user":
-                    st.write(f"**🟢 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
+                    st.write(f"**🟢 {sender}:** {msg['message']}")
                 else:
-                    st.write(f"**💬 {sender}** [{timestamp.strftime('%b %d, %Y %I:%M %p')}]: {msg['message']}")
+                    st.write(f"**💬 {sender}:** {msg['message']}")
 
             st.write("---")
 
