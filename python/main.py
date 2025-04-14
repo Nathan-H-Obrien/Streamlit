@@ -24,9 +24,9 @@ client = MongoClient(MONGO_URI)
 db = client[DATABASE_NAME]
 users_collection = db["users"]  # Collection for storing user credentials
 
-user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
-
 def main_page():
+    user = users_collection.find_one({"_id": ObjectId(st.session_state.user_id)})
+    
     # Define the pages
     PAGES = {
         "🏠 Home": home_page,
